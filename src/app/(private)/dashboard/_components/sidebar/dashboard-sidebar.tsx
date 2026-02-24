@@ -1,4 +1,12 @@
-import { LayoutDashboard, Users, Workflow } from "lucide-react";
+import {
+  FolderOpen,
+  Inbox,
+  Landmark,
+  Layers,
+  LayoutDashboard,
+  Users,
+  Workflow,
+} from "lucide-react";
 import { headers } from "next/headers";
 import {
   Sidebar,
@@ -29,6 +37,24 @@ const menuLinks = {
         icon: LayoutDashboard,
         roles: ["admin", "user"],
       },
+      {
+        title: "Meus Processos",
+        url: "/dashboard/my-processes",
+        icon: FolderOpen,
+        roles: ["admin", "user"],
+      },
+      {
+        title: "Caixa de Entrada",
+        url: "/dashboard/inbox",
+        icon: Inbox,
+        roles: ["admin", "user"],
+      },
+      {
+        title: "Todos os Processos",
+        url: "/dashboard/processes",
+        icon: Layers,
+        roles: ["admin", "user"],
+      },
     ],
   },
   Admin: {
@@ -38,6 +64,12 @@ const menuLinks = {
         title: "Usuários",
         url: "/dashboard/users",
         icon: Users,
+        roles: ["admin"],
+      },
+      {
+        title: "Setores",
+        url: "/dashboard/sectors",
+        icon: Landmark,
         roles: ["admin"],
       },
     ],
