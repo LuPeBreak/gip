@@ -2,6 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
+import { DataTableColumnHeader } from "../../_components/data-table-column-header";
 
 // This type is used to define the shape of our data.
 export type UserColumn = {
@@ -16,15 +17,21 @@ export type UserColumn = {
 export const columns: ColumnDef<UserColumn>[] = [
   {
     accessorKey: "name",
-    header: "Nome",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Nome" />
+    ),
   },
   {
     accessorKey: "email",
-    header: "Email",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email" />
+    ),
   },
   {
     accessorKey: "role",
-    header: "Cargo",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Cargo" />
+    ),
     cell: ({ row }) => {
       const role = row.getValue("role") as string;
       return (

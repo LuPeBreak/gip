@@ -15,29 +15,39 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DataTablePagination } from "./data-table-pagination";
+import { DataTableToolbar } from "./data-table-toolbar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  pageCount: number;
+  totalCount: number;
   tableActions?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  pageCount,
+  totalCount,
   tableActions,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
+    pageCount, // Provide total pages from server
+    manualPagination: true, // Tell react-table we're handling pagination on server
     getCoreRowModel: getCoreRowModel(),
   });
 
   return (
     <div className="space-y-4">
-      {tableActions && (
-        <div className="flex items-center justify-end">{tableActions}</div>
-      )}
+      <div className="flex items-center justify-between">
+        <DataTableToolbar table={table} />
+        {tableActions && <div className="ml-auto">{tableActions}</div>}
+      </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -88,6 +98,8 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+
+      <DataTablePagination table={table} totalCount={totalCount} />
     </div>
   );
 }
