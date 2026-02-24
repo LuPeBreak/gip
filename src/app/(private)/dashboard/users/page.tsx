@@ -1,12 +1,18 @@
-export default function UsersPage() {
+import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
+import { DataTable } from "../_components/data-table";
+import { getUsers } from "./_actions/get-users";
+import { columns } from "./_components/data-table-columns";
+
+export default async function UsersPage() {
+  const response = await getUsers();
+  const users = response.success && response.data ? response.data : [];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center p-6 text-center min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Usuários do Sistema</h1>
-      <p className="max-w-md text-muted-foreground">
-        Área de gestão de contas (Admin). Aqui o administrador lista os
-        usuários, cria novos cadastros, realiza bloqueio/banimento de contas e
-        reseta senhas.
-      </p>
-    </div>
+    <DashboardPageWrapper
+      title="Usuários do Sistema"
+      description="Gerencie o acesso, cargos e setores dos usuários da plataforma."
+    >
+      <DataTable columns={columns} data={users} />
+    </DashboardPageWrapper>
   );
 }

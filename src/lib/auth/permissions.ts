@@ -18,3 +18,8 @@ export const admin = ac.newRole({
 export const user = ac.newRole({
   ...userAc.statements,
 });
+
+export interface PermissionOption {
+  resource: string;
+  action?: string[];
+}
