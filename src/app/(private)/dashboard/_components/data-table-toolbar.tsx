@@ -56,7 +56,7 @@ export function DataTableToolbar<TData>({
         />
 
         <Select
-          value={role ?? ""}
+          value={role || "all"}
           onValueChange={(value) => setRole(value === "all" ? "" : value)}
         >
           <SelectTrigger className="h-9 w-[150px]">

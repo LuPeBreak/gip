@@ -2,6 +2,7 @@ import type { SearchParams } from "nuqs/server";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import { DataTable } from "../_components/data-table";
 import { getUsers } from "./_actions/get-users";
+import { CreateUserDialog } from "./_components/create-user-dialog";
 import { columns } from "./_components/data-table-columns";
 import { usersSearchParamsCache } from "./_components/search-params";
 
@@ -43,6 +44,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
         data={users}
         pageCount={pageCount}
         totalCount={totalCount}
+        tableActions={<CreateUserDialog />}
       />
     </DashboardPageWrapper>
   );
