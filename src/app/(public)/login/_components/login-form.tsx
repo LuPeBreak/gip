@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -17,13 +17,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth/auth-client";
 import { cn } from "@/lib/utils";
@@ -42,7 +40,11 @@ export function LoginForm({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<FormSchemaType>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -114,55 +116,53 @@ export function LoginForm({
           <CardDescription>Prefeitura de Barra Mansa</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="flex flex-col gap-6">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>E-mail</FormLabel>
-                      <FormControl>
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="seu@email.com"
-                          required
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Senha</FormLabel>
-                      <FormControl>
-                        <Input
-                          id="password"
-                          type="password"
-                          required
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full" disabled={isPending}>
-                  {isPending && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Entrar
-                </Button>
-              </div>
-            </form>
-          </Form>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <FieldGroup className="flex flex-col gap-6">
+              <Controller
+                control={control}
+                name="email"
+                render={({ field }) => (
+                  <Field data-invalid={!!errors.email}>
+                    <FieldLabel htmlFor="email">E-mail</FieldLabel>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="seu@email.com"
+                      required
+                      {...field}
+                      disabled={isPending}
+                    />
+                    {errors.email?.message && (
+                      <FieldError>{errors.email.message}</FieldError>
+                    )}
+                  </Field>
+                )}
+              />
+              <Controller
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <Field data-invalid={!!errors.password}>
+                    <FieldLabel htmlFor="password">Senha</FieldLabel>
+                    <Input
+                      id="password"
+                      type="password"
+                      required
+                      {...field}
+                      disabled={isPending}
+                    />
+                    {errors.password?.message && (
+                      <FieldError>{errors.password.message}</FieldError>
+                    )}
+                  </Field>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Entrar
+              </Button>
+            </FieldGroup>
+          </form>
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground">
