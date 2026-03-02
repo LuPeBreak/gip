@@ -3,6 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "../../_components/data-table-column-header";
+import { DataTableRowActions } from "./data-table-row-actions";
 
 // This type is used to define the shape of our data.
 export type UserColumn = {
@@ -52,5 +53,9 @@ export const columns: ColumnDef<UserColumn>[] = [
         </Badge>
       );
     },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <DataTableRowActions user={row.original} />,
   },
 ];
