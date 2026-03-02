@@ -1,7 +1,6 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "../../_components/data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 
@@ -33,15 +32,11 @@ export const columns: ColumnDef<SectorColumn>[] = [
   {
     accessorKey: "usersCount",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Usuários Vinculados" />
+      <DataTableColumnHeader column={column} title="Funcionários" />
     ),
     cell: ({ row }) => {
       const count = row.getValue("usersCount") as number;
-      return (
-        <Badge variant={count > 0 ? "secondary" : "outline"}>
-          {count} {count === 1 ? "Usuário" : "Usuários"}
-        </Badge>
-      );
+      return <span className="font-medium text-muted-foreground">{count}</span>;
     },
   },
   {

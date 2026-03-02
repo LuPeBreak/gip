@@ -2,6 +2,7 @@ import type { SearchParams } from "nuqs/server";
 import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
 import { DataTable } from "../_components/data-table";
 import { getSectors } from "./_actions/get-sectors";
+import { CreateSectorButton } from "./_components/create-sector-button";
 import { columns } from "./_components/data-table-columns";
 import { SectorDataTableToolbar } from "./_components/data-table-toolbar";
 import { sectorsSearchParamsCache } from "./_components/search-params";
@@ -43,6 +44,7 @@ export default async function SectorsPage({ searchParams }: SectorsPageProps) {
         pageCount={pageCount}
         totalCount={totalCount}
         toolbar={<SectorDataTableToolbar />}
+        tableActions={<CreateSectorButton />}
       />
     </DashboardPageWrapper>
   );
