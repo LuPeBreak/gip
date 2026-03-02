@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { pageParser, pageSizeParser } from "../users/_components/search-params";
+import { pageParser, pageSizeParser } from "./search-params";
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;

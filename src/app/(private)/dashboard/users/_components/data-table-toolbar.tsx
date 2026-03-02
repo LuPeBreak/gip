@@ -1,6 +1,5 @@
 "use client";
 
-import type { Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { useTransition } from "react";
@@ -13,15 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { roleParser, searchParser } from "../users/_components/search-params";
+import { roleParser, searchParser } from "./search-params";
 
-interface DataTableToolbarProps<TData> {
-  table: Table<TData>;
-}
-
-export function DataTableToolbar<TData>({
-  table: _table,
-}: DataTableToolbarProps<TData>) {
+export function UsersDataTableToolbar() {
   const [isPending, startTransition] = useTransition();
 
   // Debounced input setup using nuqs for standard React Server Components

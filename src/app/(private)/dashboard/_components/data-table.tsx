@@ -16,7 +16,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DataTablePagination } from "./data-table-pagination";
-import { DataTableToolbar } from "./data-table-toolbar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -24,6 +23,7 @@ interface DataTableProps<TData, TValue> {
   pageCount: number;
   totalCount: number;
   tableActions?: React.ReactNode;
+  toolbar?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -32,6 +32,7 @@ export function DataTable<TData, TValue>({
   pageCount,
   totalCount,
   tableActions,
+  toolbar,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -44,7 +45,7 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <DataTableToolbar table={table} />
+        {toolbar && toolbar}
         {tableActions && <div className="ml-auto">{tableActions}</div>}
       </div>
 

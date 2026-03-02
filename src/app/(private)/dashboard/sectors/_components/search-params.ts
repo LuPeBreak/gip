@@ -1,4 +1,4 @@
-import { createSearchParamsCache, parseAsString } from "nuqs/server";
+import { createSearchParamsCache } from "nuqs/server";
 import {
   orderByParser,
   orderParser,
@@ -7,13 +7,10 @@ import {
   searchParser,
 } from "../../_components/search-params";
 
-export const roleParser = parseAsString.withDefault("");
-
-export const usersSearchParamsCache = createSearchParamsCache({
+export const sectorsSearchParamsCache = createSearchParamsCache({
   page: pageParser,
   pageSize: pageSizeParser,
   search: searchParser,
-  role: roleParser,
   orderBy: orderByParser,
   order: orderParser,
 });
