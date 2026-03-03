@@ -27,7 +27,7 @@ export const createUser = withPermissions(
         );
       }
 
-      const { name, email, password, role } = parsedData.data;
+      const { name, email, password, role, sectorId } = parsedData.data;
 
       // 2. Create user via Better Auth Admin API
       // Better auth handles the hashing and database insertion automatically
@@ -37,6 +37,9 @@ export const createUser = withPermissions(
           email,
           password,
           role,
+          data: {
+            sectorId,
+          },
         },
       });
 

@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, PenLine } from "lucide-react";
-import { useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { editUser } from "@/app/(private)/dashboard/users/_actions/edit-user";
@@ -29,6 +29,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  getAllSectors,
+  type SimpleSector,
+} from "../../sectors/_actions/get-all-sectors";
 import type { UserColumn } from "./data-table-columns";
 import { type EditUserFormValues, editUserSchema } from "./edit-user-schema";
 
@@ -44,6 +48,18 @@ export function EditUserDialog({
   onOpenChange,
 }: EditUserDialogProps) {
   const [isPending, startTransition] = useTransition();
+  const [sectors, setSectors] = useState<SimpleSector[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      // Fetch sectors only when dialog is opened
+      getAllSectors().then((res) => {
+        if (res.success && res.data) {
+          setSectors(res.data);
+        }
+      });
+    }
+  }, [open]);
 
   const {
     control,
@@ -55,6 +71,7 @@ export function EditUserDialog({
     values: {
       name: user.name,
       role: (user.role as "admin" | "user") || "user",
+      sectorId: user.sectorId || undefined,
     },
   });
 
@@ -152,6 +169,47 @@ export function EditUserDialog({
                   </Select>
                   {errors.role?.message && (
                     <FieldError>{errors.role.message}</FieldError>
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="sectorId"
+              control={control}
+              render={({ field }) => (
+                <Field data-invalid={!!errors.sectorId}>
+                  <FieldLabel htmlFor="edit-sectorId">Setor</FieldLabel>
+                  <Select
+                    disabled={isPending || sectors.length === 0}
+                    onValueChange={(val) =>
+                      field.onChange(val === "none" ? null : val)
+                    }
+                    value={field.value || "none"}
+                  >
+                    <SelectTrigger id="edit-sectorId" className="w-full">
+                      <SelectValue
+                        placeholder={
+                          sectors.length === 0
+                            ? "Carregando setores..."
+                            : "Nenhum setor selecionado"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum Setor</SelectItem>
+                      {sectors.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[0.8rem] text-muted-foreground mt-1">
+                    Através de qual área da prefeitura esse usuário atua.
+                  </p>
+                  {errors.sectorId?.message && (
+                    <FieldError>{errors.sectorId.message}</FieldError>
                   )}
                 </Field>
               )}

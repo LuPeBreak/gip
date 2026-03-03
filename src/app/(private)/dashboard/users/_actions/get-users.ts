@@ -56,7 +56,7 @@ export const getUsers = withPermissions(
       }
 
       // Execute transaction for count and data fetch cleanly
-      const [totalCount, users] = await prisma.$transaction([
+      const [totalCount, usersData] = await prisma.$transaction([
         prisma.user.count({ where: whereClause }),
         prisma.user.findMany({
           where: whereClause,
@@ -67,6 +67,12 @@ export const getUsers = withPermissions(
             role: true,
             banned: true,
             banReason: true,
+            sectorId: true,
+            sector: {
+              select: {
+                name: true,
+              },
+            },
           },
           orderBy: {
             [orderBy]: order,
@@ -77,6 +83,17 @@ export const getUsers = withPermissions(
       ]);
 
       const pageCount = Math.ceil(totalCount / pageSize);
+
+      const users = usersData.map((user) => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        banned: user.banned,
+        banReason: user.banReason,
+        sectorId: user.sectorId,
+        sectorName: user.sector?.name || null,
+      }));
 
       return createSuccessResponse({
         data: users as UserColumn[],

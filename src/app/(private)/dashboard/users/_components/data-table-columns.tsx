@@ -13,6 +13,8 @@ export type UserColumn = {
   role: string | null;
   banned?: boolean | null;
   banReason?: string | null;
+  sectorId?: string | null;
+  sectorName?: string | null;
 };
 
 export const columns: ColumnDef<UserColumn>[] = [
@@ -40,6 +42,16 @@ export const columns: ColumnDef<UserColumn>[] = [
           {role || "user"}
         </Badge>
       );
+    },
+  },
+  {
+    accessorKey: "sectorName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Setor" />
+    ),
+    cell: ({ row }) => {
+      const sectorName = row.getValue("sectorName") as string | undefined;
+      return <span className="text-muted-foreground">{sectorName || "—"}</span>;
     },
   },
   {

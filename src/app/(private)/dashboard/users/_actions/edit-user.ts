@@ -9,6 +9,7 @@ import {
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
 import { auth } from "@/lib/auth/auth";
+import { prisma } from "@/lib/prisma";
 import {
   type EditUserFormValues,
   editUserSchema,
@@ -25,6 +26,7 @@ export const editUser = withPermissions(
       const parsedData = editUserSchema.safeParse({
         name: params.name,
         role: params.role,
+        sectorId: params.sectorId,
       });
 
       if (!parsedData.success) {
@@ -34,7 +36,7 @@ export const editUser = withPermissions(
         );
       }
 
-      const { name, role } = parsedData.data;
+      const { name, role, sectorId } = parsedData.data;
       const { userId } = params;
       const reqHeaders = await headers();
 
@@ -48,6 +50,14 @@ export const editUser = withPermissions(
           },
         },
       });
+
+      // Se o schema previu explicitamente atualizar o sector (pode ser null/undefined para limpar or string pra setar)
+      if (sectorId !== undefined) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { sectorId },
+        });
+      }
 
       revalidatePath("/dashboard/users");
 

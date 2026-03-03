@@ -8,6 +8,7 @@ export const editUserSchema = z.object({
   role: z.enum(["admin", "user"], {
     message: "Selecione um cargo válido",
   }),
+  sectorId: z.string().cuid("Selecione um setor válido.").nullable().optional(),
 });
 
 export type EditUserFormValues = z.infer<typeof editUserSchema>;
