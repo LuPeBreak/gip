@@ -26,6 +26,8 @@ model User {
   sectorId String?
   sector   Sector? @relation(fields: [sectorId], references: [id], onDelete: Restrict)
 
+  ownedProcesses Process[] @relation("ProcessOwner")
+
   @@unique([email])
   @@map("user")
 }
@@ -91,4 +93,25 @@ model Sector {
   updatedAt DateTime @updatedAt
 
   @@map("sector")
+}
+
+enum ProcessStatus {
+  OPEN
+  FINISHED
+  EXTERNAL
+}
+
+model Process {
+  id          String        @id @default(cuid())
+  number      String        @unique
+  description String
+  status      ProcessStatus @default(OPEN)
+
+  ownerId String?
+  owner   User?   @relation("ProcessOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("process")
 }

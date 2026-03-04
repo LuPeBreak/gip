@@ -3,6 +3,7 @@ import {
   type ActionResponse,
   createErrorResponse,
   createSuccessResponse,
+  type PaginatedData,
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
 import { prisma } from "@/lib/prisma";
@@ -15,13 +16,6 @@ export interface GetUsersParams {
   role?: string;
   orderBy?: string;
   order?: "asc" | "desc";
-}
-
-export interface PaginatedData<T> {
-  data: T[];
-  totalCount: number;
-  pageCount: number;
-  page: number;
 }
 
 export const getUsers = withPermissions(

@@ -12,6 +12,13 @@ export interface ActionResponse<T = void> {
   };
 }
 
+export interface PaginatedData<T> {
+  data: T[];
+  totalCount: number;
+  pageCount: number;
+  page: number;
+}
+
 export function createSuccessResponse<T>(
   data?: T,
   meta?: ActionResponse["meta"],
