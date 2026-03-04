@@ -1,4 +1,5 @@
 "use server";
+
 import {
   type ActionResponse,
   createErrorResponse,
@@ -8,18 +9,16 @@ import {
 import { withPermissions } from "@/lib/actions/with-permissions";
 import { prisma } from "@/lib/prisma";
 import type { ProcessStatus } from "@/lib/prisma/generated/enums";
-export type ProcessItem = {
+
+export type MyProcessItem = {
   id: string;
   number: string;
   description: string;
   status: "OPEN" | "FINISHED" | "EXTERNAL";
-  ownerId: string | null;
-  ownerName?: string | null;
-  ownerSectorName?: string | null;
   createdAt: Date;
 };
 
-export interface GetAllProcessesParams {
+export interface GetMyProcessesParams {
   page?: number;
   pageSize?: number;
   search?: string;
@@ -28,12 +27,12 @@ export interface GetAllProcessesParams {
   order?: "asc" | "desc";
 }
 
-export const getAllProcesses = withPermissions(
+export const getMyProcesses = withPermissions(
   [{ resource: "process", action: ["list"] }],
   async (
-    _session,
-    params?: GetAllProcessesParams,
-  ): Promise<ActionResponse<PaginatedData<ProcessItem>>> => {
+    session,
+    params?: GetMyProcessesParams,
+  ): Promise<ActionResponse<PaginatedData<MyProcessItem>>> => {
     try {
       const page = params?.page ?? 1;
       const pageSize = params?.pageSize ?? 15;
@@ -45,7 +44,10 @@ export const getAllProcesses = withPermissions(
       type ProcessWhereInput = NonNullable<
         Parameters<typeof prisma.process.count>[0]
       >["where"];
-      const whereClause: ProcessWhereInput = {};
+
+      const whereClause: ProcessWhereInput = {
+        ownerId: session.user.id, // Strictly filter by the current session user
+      };
 
       if (search) {
         whereClause.OR = [
@@ -62,16 +64,6 @@ export const getAllProcesses = withPermissions(
         prisma.process.count({ where: whereClause }),
         prisma.process.findMany({
           where: whereClause,
-          include: {
-            owner: {
-              select: {
-                name: true,
-                sector: {
-                  select: { name: true },
-                },
-              },
-            },
-          },
           orderBy: {
             [orderBy]: order,
           },
@@ -82,14 +74,11 @@ export const getAllProcesses = withPermissions(
 
       const pageCount = Math.ceil(totalCount / pageSize);
 
-      const formattedProcesses: ProcessItem[] = processes.map((proc) => ({
+      const formattedProcesses: MyProcessItem[] = processes.map((proc) => ({
         id: proc.id,
         number: proc.number,
         description: proc.description,
-        status: proc.status as ProcessItem["status"],
-        ownerId: proc.ownerId,
-        ownerName: proc.owner?.name,
-        ownerSectorName: proc.owner?.sector?.name,
+        status: proc.status as MyProcessItem["status"],
         createdAt: proc.createdAt,
       }));
 
@@ -100,9 +89,9 @@ export const getAllProcesses = withPermissions(
         page,
       });
     } catch (error) {
-      console.error("Erro ao buscar todos os processos:", error);
+      console.error("Erro ao buscar meus processos:", error);
       return createErrorResponse(
-        "Erro interno do servidor ao buscar processos",
+        "Erro interno do servidor ao buscar seus processos",
       );
     }
   },

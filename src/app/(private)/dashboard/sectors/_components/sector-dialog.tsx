@@ -29,7 +29,7 @@ import {
   type CreateSectorData,
   createSectorSchema,
 } from "../_schemas/sector-schemas";
-import type { SectorColumn } from "./data-table-columns";
+import type { SectorColumn } from "./sectors-data-table-columns";
 
 interface SectorDialogProps {
   sector?: SectorColumn;

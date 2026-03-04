@@ -7,7 +7,7 @@ import {
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
 import { prisma } from "@/lib/prisma";
-import type { UserColumn } from "../_components/data-table-columns";
+import type { UserColumn } from "../_components/users-data-table-columns";
 
 export interface GetUsersParams {
   page?: number;

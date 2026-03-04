@@ -8,34 +8,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { authClient } from "@/lib/auth/auth-client";
+import type { MyProcessItem } from "../_actions/get-my-processes";
 
-export type ProcessColumn = {
-  id: string;
-  number: string;
-  description: string;
-  status: "OPEN" | "FINISHED" | "EXTERNAL";
-  ownerId: string | null;
-  ownerName?: string | null;
-  createdAt: Date;
-};
-
-interface DataTableRowActionsProps {
-  processData: ProcessColumn;
-  readonlyActions?: boolean;
+interface MyProcessesDataTableRowActionsProps {
+  processData: MyProcessItem;
 }
 
-export function DataTableRowActions({
+export function MyProcessesDataTableRowActions({
   processData,
-  readonlyActions,
-}: DataTableRowActionsProps) {
-  if (readonlyActions) {
-    return (
-      <Button variant="ghost" disabled className="flex h-8 w-8 p-0">
-        <MoreHorizontal className="h-4 w-4 opacity-50" />
-        <span className="sr-only">Ações Bloqueadas</span>
-      </Button>
-    );
-  }
+}: MyProcessesDataTableRowActionsProps) {
+  const { data: session } = authClient.useSession();
+  const userRole = session?.user.role;
+
+  const isAdmin = authClient.admin.checkRolePermission({
+    permissions: { process: ["delete"] }, // Checking delete perm as proxy for admin power here
+    role: (userRole ?? "user") as "admin" | "user",
+  });
+
+  const isOpen = processData.status === "OPEN";
 
   return (
     <DropdownMenu>
@@ -45,20 +36,22 @@ export function DataTableRowActions({
           <span className="sr-only">Abrir menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
-        {processData.status === "OPEN" && (
+      <DropdownMenuContent align="end" className="w-[180px]">
+        {isOpen && (
           <DropdownMenuItem>
             <Archive className="mr-2 h-4 w-4" />
             Finalizar
           </DropdownMenuItem>
         )}
 
-        <DropdownMenuItem>
-          <Edit className="mr-2 h-4 w-4" />
-          Editar
-        </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem>
+            <Edit className="mr-2 h-4 w-4" />
+            Editar
+          </DropdownMenuItem>
+        )}
 
-        {processData.status === "OPEN" && (
+        {isAdmin && isOpen && (
           <DropdownMenuItem className="text-destructive">
             <Trash className="mr-2 h-4 w-4" />
             Excluir

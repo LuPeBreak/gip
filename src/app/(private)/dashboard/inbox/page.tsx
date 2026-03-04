@@ -1,4 +1,4 @@
-import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
+import { DashboardPageWrapper } from "../../../../components/layout/dashboard-page-wrapper";
 
 export default function InboxPage() {
   return (

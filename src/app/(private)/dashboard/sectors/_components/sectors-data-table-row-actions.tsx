@@ -9,15 +9,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { SectorColumn } from "./data-table-columns";
 import { DeleteSectorDialog } from "./delete-sector-dialog";
 import { SectorDialog } from "./sector-dialog";
+import type { SectorColumn } from "./sectors-data-table-columns";
 
-interface DataTableRowActionsProps {
+interface SectorsDataTableRowActionsProps {
   sector: SectorColumn;
 }
 
-export function DataTableRowActions({ sector }: DataTableRowActionsProps) {
+export function SectorsDataTableRowActions({
+  sector,
+}: SectorsDataTableRowActionsProps) {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 

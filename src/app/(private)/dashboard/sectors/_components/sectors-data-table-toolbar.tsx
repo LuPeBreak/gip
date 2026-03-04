@@ -5,31 +5,17 @@ import { useQueryState } from "nuqs";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { roleParser, searchParser } from "./search-params";
+import { searchParser } from "./sectors-search-params";
 
-export function UsersDataTableToolbar() {
+export function SectorsDataTableToolbar() {
   const [isPending, startTransition] = useTransition();
 
-  // Debounced input setup using nuqs for standard React Server Components
   const [search, setSearch] = useQueryState(
     "search",
     searchParser.withOptions({ shallow: false, startTransition }),
   );
 
-  // Debounced input setup using nuqs for standard React Server Components
-  const [role, setRole] = useQueryState(
-    "role",
-    roleParser.withOptions({ shallow: false, startTransition }),
-  );
-
-  const isFiltered = search !== "" || role !== "";
+  const isFiltered = search !== "";
 
   return (
     <div className="flex items-center justify-between">
@@ -41,33 +27,18 @@ export function UsersDataTableToolbar() {
           data-lpignore="true"
           data-1p-ignore="true"
           data-kpm-ignore="true"
-          placeholder="Procurar registro..."
+          placeholder="Procurar setor por nome ou descrição..."
           value={search ?? ""}
           onChange={(event) => setSearch(event.target.value)}
-          className="h-9 w-[150px] lg:w-[250px]"
+          className="h-9 w-[250px] lg:w-[350px]"
           data-pending={isPending ? "" : undefined}
         />
-
-        <Select
-          value={role || "all"}
-          onValueChange={(value) => setRole(value === "all" ? "" : value)}
-        >
-          <SelectTrigger className="h-9 w-[150px]">
-            <SelectValue placeholder="Cargo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os Cargos</SelectItem>
-            <SelectItem value="admin">Administrador</SelectItem>
-            <SelectItem value="user">Usuário</SelectItem>
-          </SelectContent>
-        </Select>
 
         {isFiltered && (
           <Button
             variant="ghost"
             onClick={() => {
               setSearch("");
-              setRole("");
             }}
             className="h-8 px-2 lg:px-3"
           >

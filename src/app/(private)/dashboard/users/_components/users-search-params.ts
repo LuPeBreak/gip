@@ -5,15 +5,15 @@ import {
   pageParser,
   pageSizeParser,
   searchParser,
-} from "../../_components/search-params";
+} from "../../../../../components/data-table/data-table-base-search-params";
 
-export const statusParser = parseAsString.withDefault("");
+export const roleParser = parseAsString.withDefault("");
 
-export const processesSearchParamsCache = createSearchParamsCache({
+export const usersSearchParamsCache = createSearchParamsCache({
   page: pageParser,
   pageSize: pageSizeParser,
   search: searchParser,
-  status: statusParser,
+  role: roleParser,
   orderBy: orderByParser,
   order: orderParser,
 });

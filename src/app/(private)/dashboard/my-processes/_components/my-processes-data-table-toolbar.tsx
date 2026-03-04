@@ -12,9 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { searchParser, statusParser } from "./search-params";
+import { searchParser, statusParser } from "./my-processes-search-params";
 
-export function ProcessDataTableToolbar() {
+export function MyProcessesDataTableToolbar() {
   const [isPending, startTransition] = useTransition();
 
   const [search, setSearch] = useQueryState(

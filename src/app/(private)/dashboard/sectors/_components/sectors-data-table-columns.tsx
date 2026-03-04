@@ -1,8 +1,8 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { DataTableColumnHeader } from "../../_components/data-table-column-header";
-import { DataTableRowActions } from "./data-table-row-actions";
+import { DataTableColumnHeader } from "../../../../../components/data-table/data-table-column-header";
+import { SectorsDataTableRowActions } from "./sectors-data-table-row-actions";
 
 export type SectorColumn = {
   id: string;
@@ -12,7 +12,7 @@ export type SectorColumn = {
   createdAt: Date;
 };
 
-export const columns: ColumnDef<SectorColumn>[] = [
+export const sectorsColumns: ColumnDef<SectorColumn>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -55,6 +55,6 @@ export const columns: ColumnDef<SectorColumn>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions sector={row.original} />,
+    cell: ({ row }) => <SectorsDataTableRowActions sector={row.original} />,
   },
 ];

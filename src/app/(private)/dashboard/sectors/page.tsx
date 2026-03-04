@@ -1,11 +1,11 @@
 import type { SearchParams } from "nuqs/server";
-import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
-import { DataTable } from "../_components/data-table";
+import { DataTable } from "../../../../components/data-table/data-table";
+import { DashboardPageWrapper } from "../../../../components/layout/dashboard-page-wrapper";
 import { getSectors } from "./_actions/get-sectors";
 import { CreateSectorButton } from "./_components/create-sector-button";
-import { columns } from "./_components/data-table-columns";
-import { SectorDataTableToolbar } from "./_components/data-table-toolbar";
-import { sectorsSearchParamsCache } from "./_components/search-params";
+import { sectorsColumns } from "./_components/sectors-data-table-columns";
+import { SectorsDataTableToolbar } from "./_components/sectors-data-table-toolbar";
+import { sectorsSearchParamsCache } from "./_components/sectors-search-params";
 
 interface SectorsPageProps {
   searchParams: Promise<SearchParams>;
@@ -39,11 +39,11 @@ export default async function SectorsPage({ searchParams }: SectorsPageProps) {
       description="Gerencie as áreas, cadastrando os micro-setores que determinam cada etapa dos processos."
     >
       <DataTable
-        columns={columns}
+        columns={sectorsColumns}
         data={sectors}
         pageCount={pageCount}
         totalCount={totalCount}
-        toolbar={<SectorDataTableToolbar />}
+        toolbar={<SectorsDataTableToolbar />}
         tableActions={<CreateSectorButton />}
       />
     </DashboardPageWrapper>

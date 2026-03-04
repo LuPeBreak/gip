@@ -20,15 +20,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { UserColumn } from "./data-table-columns";
 import { EditUserDialog } from "./edit-user-dialog";
 import { ResetPasswordDialog } from "./reset-password-dialog";
+import type { UserColumn } from "./users-data-table-columns";
 
-interface DataTableRowActionsProps {
+interface UsersDataTableRowActionsProps {
   user: UserColumn;
 }
 
-export function DataTableRowActions({ user }: DataTableRowActionsProps) {
+export function UsersDataTableRowActions({
+  user,
+}: UsersDataTableRowActionsProps) {
   const [isPending, startTransition] = useTransition();
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);

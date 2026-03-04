@@ -1,14 +1,12 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
-import { DataTableColumnHeader } from "../../_components/data-table-column-header";
-import {
-  DataTableRowActions,
-  type ProcessColumn,
-} from "./data-table-row-actions";
+import { ProcessStatusBadge } from "@/components/processes/process-status-badge";
+import { DataTableColumnHeader } from "../../../../../components/data-table/data-table-column-header";
+import type { ProcessItem } from "../_actions/get-processes";
+import { ProcessesDataTableRowActions } from "./processes-data-table-row-actions";
 
-export const columns: ColumnDef<ProcessColumn>[] = [
+export const processesColumns: ColumnDef<ProcessItem>[] = [
   {
     accessorKey: "number",
     header: ({ column }) => (
@@ -32,6 +30,8 @@ export const columns: ColumnDef<ProcessColumn>[] = [
     ),
     cell: ({ row }) => {
       const ownerName = row.original.ownerName;
+      const sectorName = row.original.ownerSectorName;
+
       if (!ownerName) {
         return (
           <span className="italic text-muted-foreground">
@@ -39,7 +39,15 @@ export const columns: ColumnDef<ProcessColumn>[] = [
           </span>
         );
       }
-      return <span>{ownerName}</span>;
+
+      return (
+        <div className="flex flex-col gap-0.5">
+          <span>{ownerName}</span>
+          {sectorName && (
+            <span className="text-xs text-muted-foreground">{sectorName}</span>
+          )}
+        </div>
+      );
     },
   },
   {
@@ -47,30 +55,7 @@ export const columns: ColumnDef<ProcessColumn>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
-    cell: ({ row }) => {
-      const status = row.original.status;
-
-      if (status === "FINISHED") {
-        return <Badge variant="secondary">Arquivado</Badge>;
-      }
-
-      if (status === "EXTERNAL") {
-        return (
-          <Badge
-            variant="outline"
-            className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-400"
-          >
-            Externo
-          </Badge>
-        );
-      }
-
-      return (
-        <Badge className="bg-emerald-500 text-white hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700">
-          Aberto
-        </Badge>
-      );
-    },
+    cell: ({ row }) => <ProcessStatusBadge status={row.original.status} />,
   },
   {
     accessorKey: "createdAt",
@@ -91,6 +76,8 @@ export const columns: ColumnDef<ProcessColumn>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions processData={row.original} />,
+    cell: ({ row }) => (
+      <ProcessesDataTableRowActions processData={row.original} />
+    ),
   },
 ];

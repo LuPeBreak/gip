@@ -5,7 +5,7 @@ import {
   pageParser,
   pageSizeParser,
   searchParser,
-} from "../../_components/search-params";
+} from "../../../../../components/data-table/data-table-base-search-params";
 
 export const sectorsSearchParamsCache = createSearchParamsCache({
   page: pageParser,

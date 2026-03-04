@@ -7,7 +7,7 @@ import {
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
 import { prisma } from "@/lib/prisma";
-import type { SectorColumn } from "../_components/data-table-columns";
+import type { SectorColumn } from "../_components/sectors-data-table-columns";
 
 export interface GetSectorsParams {
   page?: number;

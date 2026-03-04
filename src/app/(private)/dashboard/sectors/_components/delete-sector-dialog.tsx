@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { SectorColumn } from "./data-table-columns";
+import type { SectorColumn } from "./sectors-data-table-columns";
 
 interface DeleteSectorDialogProps {
   sector: SectorColumn;

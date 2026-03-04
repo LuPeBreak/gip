@@ -2,8 +2,8 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { DataTableColumnHeader } from "../../_components/data-table-column-header";
-import { DataTableRowActions } from "./data-table-row-actions";
+import { DataTableColumnHeader } from "../../../../../components/data-table/data-table-column-header";
+import { UsersDataTableRowActions } from "./users-data-table-row-actions";
 
 // This type is used to define the shape of our data.
 export type UserColumn = {
@@ -17,7 +17,7 @@ export type UserColumn = {
   sectorName?: string | null;
 };
 
-export const columns: ColumnDef<UserColumn>[] = [
+export const usersColumns: ColumnDef<UserColumn>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -68,6 +68,6 @@ export const columns: ColumnDef<UserColumn>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions user={row.original} />,
+    cell: ({ row }) => <UsersDataTableRowActions user={row.original} />,
   },
 ];

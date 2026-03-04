@@ -2,12 +2,12 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { SearchParams } from "nuqs/server";
 import { auth } from "@/lib/auth/auth";
-import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
-import { DataTable } from "../_components/data-table";
-import { getProcesses } from "./_actions/get-processes";
-import { columns } from "./_components/data-table-columns";
-import { ProcessDataTableToolbar } from "./_components/data-table-toolbar";
-import { processesSearchParamsCache } from "./_components/search-params";
+import { DataTable } from "../../../../components/data-table/data-table";
+import { DashboardPageWrapper } from "../../../../components/layout/dashboard-page-wrapper";
+import { getAllProcesses } from "./_actions/get-processes";
+import { processesColumns } from "./_components/processes-data-table-columns";
+import { ProcessesDataTableToolbar } from "./_components/processes-data-table-toolbar";
+import { processesSearchParamsCache } from "./_components/processes-search-params";
 
 interface ProcessesPageProps {
   searchParams: Promise<SearchParams>;
@@ -29,7 +29,7 @@ export default async function ProcessesPage({
     processesSearchParamsCache.parse(sp);
 
   // No ownerId filter: lists all processes in the system
-  const response = await getProcesses({
+  const response = await getAllProcesses({
     page,
     pageSize,
     search,
@@ -53,11 +53,11 @@ export default async function ProcessesPage({
       description="Visão geral de todos os processos cadastrados no sistema e suas posses atuais."
     >
       <DataTable
-        columns={columns}
+        columns={processesColumns}
         data={processes}
         pageCount={pageCount}
         totalCount={totalCount}
-        toolbar={<ProcessDataTableToolbar />}
+        toolbar={<ProcessesDataTableToolbar />}
       />
     </DashboardPageWrapper>
   );

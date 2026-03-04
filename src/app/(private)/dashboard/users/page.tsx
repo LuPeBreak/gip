@@ -1,11 +1,11 @@
 import type { SearchParams } from "nuqs/server";
-import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
-import { DataTable } from "../_components/data-table";
+import { DataTable } from "../../../../components/data-table/data-table";
+import { DashboardPageWrapper } from "../../../../components/layout/dashboard-page-wrapper";
 import { getUsers } from "./_actions/get-users";
 import { CreateUserDialog } from "./_components/create-user-dialog";
-import { columns } from "./_components/data-table-columns";
-import { UsersDataTableToolbar } from "./_components/data-table-toolbar";
-import { usersSearchParamsCache } from "./_components/search-params";
+import { usersColumns } from "./_components/users-data-table-columns";
+import { UsersDataTableToolbar } from "./_components/users-data-table-toolbar";
+import { usersSearchParamsCache } from "./_components/users-search-params";
 
 interface UsersPageProps {
   searchParams: Promise<SearchParams>;
@@ -41,7 +41,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
       description="Gerencie o acesso, cargos e setores dos usuários da plataforma."
     >
       <DataTable
-        columns={columns}
+        columns={usersColumns}
         data={users}
         pageCount={pageCount}
         totalCount={totalCount}

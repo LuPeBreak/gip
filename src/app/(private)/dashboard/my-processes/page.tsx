@@ -2,12 +2,12 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { SearchParams } from "nuqs/server";
 import { auth } from "@/lib/auth/auth";
-import { DashboardPageWrapper } from "../_components/dashboard-page-wrapper";
-import { DataTable } from "../_components/data-table";
-import { getProcesses } from "../processes/_actions/get-processes";
-import { columns } from "../processes/_components/data-table-columns";
-import { ProcessDataTableToolbar } from "../processes/_components/data-table-toolbar";
-import { processesSearchParamsCache } from "../processes/_components/search-params";
+import { DataTable } from "../../../../components/data-table/data-table";
+import { DashboardPageWrapper } from "../../../../components/layout/dashboard-page-wrapper";
+import { getMyProcesses } from "./_actions/get-my-processes";
+import { myProcessesColumns } from "./_components/my-processes-data-table-columns";
+import { MyProcessesDataTableToolbar } from "./_components/my-processes-data-table-toolbar";
+import { processesSearchParamsCache } from "./_components/my-processes-search-params";
 
 interface MyProcessesPageProps {
   searchParams: Promise<SearchParams>;
@@ -29,14 +29,13 @@ export default async function MyProcessesPage({
   const { page, pageSize, search, status, orderBy, order } =
     processesSearchParamsCache.parse(sp);
 
-  const response = await getProcesses({
+  const response = await getMyProcesses({
     page,
     pageSize,
     search,
     status,
     orderBy,
     order: order as "asc" | "desc",
-    ownerId: session.user.id, // FILTER ONLY MINE
   });
 
   const processes =
@@ -55,11 +54,11 @@ export default async function MyProcessesPage({
       description="Gerencie os processos que estão atualmente sob sua posse na sua mesa de trabalho."
     >
       <DataTable
-        columns={columns}
+        columns={myProcessesColumns}
         data={processes}
         pageCount={pageCount}
         totalCount={totalCount}
-        toolbar={<ProcessDataTableToolbar />}
+        toolbar={<MyProcessesDataTableToolbar />}
       />
     </DashboardPageWrapper>
   );

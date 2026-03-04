@@ -31,11 +31,11 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { generatePasswordFromName } from "@/lib/utils/password";
-import type { UserColumn } from "./data-table-columns";
 import {
   type ResetPasswordFormValues,
   resetPasswordSchema,
 } from "./reset-password-schema";
+import type { UserColumn } from "./users-data-table-columns";
 
 interface ResetPasswordDialogProps {
   user: UserColumn;

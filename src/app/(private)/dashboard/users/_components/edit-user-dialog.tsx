@@ -33,8 +33,8 @@ import {
   getAllSectors,
   type SimpleSector,
 } from "../../sectors/_actions/get-all-sectors";
-import type { UserColumn } from "./data-table-columns";
 import { type EditUserFormValues, editUserSchema } from "./edit-user-schema";
+import type { UserColumn } from "./users-data-table-columns";
 
 interface EditUserDialogProps {
   user: UserColumn;
