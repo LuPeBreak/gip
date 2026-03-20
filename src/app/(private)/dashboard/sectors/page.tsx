@@ -1,11 +1,11 @@
 import type { SearchParams } from "nuqs/server";
+import { getSectors } from "@/actions/sectors/get-sectors";
+import { CreateSectorButton } from "@/components/dashboard/sectors/create-sector-button";
+import { sectorsColumns } from "@/components/dashboard/sectors/sectors-data-table-columns";
+import { SectorsDataTableToolbar } from "@/components/dashboard/sectors/sectors-data-table-toolbar";
+import { sectorsSearchParamsCache } from "@/components/dashboard/sectors/sectors-search-params";
 import { DataTable } from "../../../../components/data-table/data-table";
 import { DashboardPageWrapper } from "../../../../components/layout/dashboard-page-wrapper";
-import { getSectors } from "./_actions/get-sectors";
-import { CreateSectorButton } from "./_components/create-sector-button";
-import { sectorsColumns } from "./_components/sectors-data-table-columns";
-import { SectorsDataTableToolbar } from "./_components/sectors-data-table-toolbar";
-import { sectorsSearchParamsCache } from "./_components/sectors-search-params";
 
 interface SectorsPageProps {
   searchParams: Promise<SearchParams>;

@@ -1,11 +1,11 @@
 import type { SearchParams } from "nuqs/server";
+import { getUsers } from "@/actions/users/get-users";
+import { CreateUserDialog } from "@/components/dashboard/users/create-user-dialog";
+import { usersColumns } from "@/components/dashboard/users/users-data-table-columns";
+import { UsersDataTableToolbar } from "@/components/dashboard/users/users-data-table-toolbar";
+import { usersSearchParamsCache } from "@/components/dashboard/users/users-search-params";
 import { DataTable } from "../../../../components/data-table/data-table";
 import { DashboardPageWrapper } from "../../../../components/layout/dashboard-page-wrapper";
-import { getUsers } from "./_actions/get-users";
-import { CreateUserDialog } from "./_components/create-user-dialog";
-import { usersColumns } from "./_components/users-data-table-columns";
-import { UsersDataTableToolbar } from "./_components/users-data-table-toolbar";
-import { usersSearchParamsCache } from "./_components/users-search-params";
 
 interface UsersPageProps {
   searchParams: Promise<SearchParams>;

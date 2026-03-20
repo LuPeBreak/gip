@@ -1,13 +1,13 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { SearchParams } from "nuqs/server";
+import { getMyProcesses } from "@/actions/processes/get-my-processes";
+import { myProcessesColumns } from "@/components/dashboard/my-processes/my-processes-data-table-columns";
+import { MyProcessesDataTableToolbar } from "@/components/dashboard/my-processes/my-processes-data-table-toolbar";
+import { processesSearchParamsCache } from "@/components/dashboard/my-processes/my-processes-search-params";
 import { auth } from "@/lib/auth/auth";
 import { DataTable } from "../../../../components/data-table/data-table";
 import { DashboardPageWrapper } from "../../../../components/layout/dashboard-page-wrapper";
-import { getMyProcesses } from "./_actions/get-my-processes";
-import { myProcessesColumns } from "./_components/my-processes-data-table-columns";
-import { MyProcessesDataTableToolbar } from "./_components/my-processes-data-table-toolbar";
-import { processesSearchParamsCache } from "./_components/my-processes-search-params";
 
 interface MyProcessesPageProps {
   searchParams: Promise<SearchParams>;
