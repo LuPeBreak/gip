@@ -9,6 +9,7 @@ const statement = {
   ...defaultStatements,
   sector: ["create", "list", "update", "delete"],
   process: ["create", "list", "update", "delete", "delete_own"],
+  user: [...defaultStatements.user, "list_minimal"],
 } as const;
 
 export const ac = createAccessControl(statement);
@@ -18,10 +19,12 @@ export const roles = {
     ...adminAc.statements,
     sector: ["create", "list", "update", "delete"],
     process: ["create", "list", "update", "delete", "delete_own"],
+    user: [...defaultStatements.user, "list_minimal"],
   }),
   user: ac.newRole({
     ...userAc.statements,
     process: ["create", "list", "delete_own"],
+    user: ["list_minimal"],
   }),
 } as const;
 

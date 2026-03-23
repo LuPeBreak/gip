@@ -1,12 +1,9 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import type { SearchParams } from "nuqs/server";
 import { getAllProcesses } from "@/actions/processes/get-processes";
 import { getAllUserOptions } from "@/actions/users/get-all-user-options";
 import { processesColumns } from "@/components/dashboard/processes/processes-data-table-columns";
 import { ProcessesDataTableToolbar } from "@/components/dashboard/processes/processes-data-table-toolbar";
 import { processesSearchParamsCache } from "@/components/dashboard/processes/processes-search-params";
-import { auth } from "@/lib/auth/auth";
 import { DataTable } from "../../../../components/data-table/data-table";
 import { DashboardPageWrapper } from "../../../../components/layout/dashboard-page-wrapper";
 
@@ -17,19 +14,9 @@ interface ProcessesPageProps {
 export default async function ProcessesPage({
   searchParams,
 }: ProcessesPageProps) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    return redirect("/login");
-  }
-
   const sp = await searchParams;
   const { page, pageSize, search, status, ownerId, orderBy, order } =
     processesSearchParamsCache.parse(sp);
-
-  const isAdmin = session.user.role === "admin";
 
   const [processesResponse, usersResponse] = await Promise.all([
     getAllProcesses({
@@ -41,7 +28,7 @@ export default async function ProcessesPage({
       orderBy,
       order: order as "asc" | "desc",
     }),
-    isAdmin ? getAllUserOptions() : { success: true, data: [] },
+    getAllUserOptions(),
   ]);
 
   const processes =
@@ -70,7 +57,7 @@ export default async function ProcessesPage({
         data={processes}
         pageCount={pageCount}
         totalCount={totalCount}
-        toolbar={<ProcessesDataTableToolbar users={users} isAdmin={isAdmin} />}
+        toolbar={<ProcessesDataTableToolbar users={users} />}
       />
     </DashboardPageWrapper>
   );

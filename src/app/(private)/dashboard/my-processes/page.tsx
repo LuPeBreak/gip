@@ -1,12 +1,9 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import type { SearchParams } from "nuqs/server";
 import { getMyProcesses } from "@/actions/processes/get-my-processes";
 import { CreateProcessButton } from "@/components/dashboard/my-processes/create-process-button";
 import { myProcessesColumns } from "@/components/dashboard/my-processes/my-processes-data-table-columns";
 import { MyProcessesDataTableToolbar } from "@/components/dashboard/my-processes/my-processes-data-table-toolbar";
 import { processesSearchParamsCache } from "@/components/dashboard/my-processes/my-processes-search-params";
-import { auth } from "@/lib/auth/auth";
 import { DataTable } from "../../../../components/data-table/data-table";
 import { DashboardPageWrapper } from "../../../../components/layout/dashboard-page-wrapper";
 
@@ -17,15 +14,6 @@ interface MyProcessesPageProps {
 export default async function MyProcessesPage({
   searchParams,
 }: MyProcessesPageProps) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    return redirect("/login");
-  }
-
-  // Parse params server-side safely using nuqs
   const sp = await searchParams;
   const { page, pageSize, search, status, orderBy, order } =
     processesSearchParamsCache.parse(sp);
@@ -48,7 +36,6 @@ export default async function MyProcessesPage({
       ? response.data.totalCount
       : 0;
 
-  // Render using standard DataTable components, and passing our Columns Config
   return (
     <DashboardPageWrapper
       title="Meus Processos Ativos"

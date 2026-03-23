@@ -14,7 +14,7 @@ export interface UserOption {
 }
 
 export const getAllUserOptions = withPermissions(
-  [{ resource: "user", action: ["list"] }],
+  [{ resource: "user", action: ["list_minimal"] }],
   async (): Promise<ActionResponse<UserOption[]>> => {
     try {
       const users = await prisma.user.findMany({

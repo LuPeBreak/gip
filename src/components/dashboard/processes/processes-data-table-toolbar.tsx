@@ -25,12 +25,10 @@ interface UserOption {
 
 interface ProcessesDataTableToolbarProps {
   users: UserOption[];
-  isAdmin?: boolean;
 }
 
 export function ProcessesDataTableToolbar({
   users,
-  isAdmin = false,
 }: ProcessesDataTableToolbarProps) {
   const [isPending, startTransition] = useTransition();
 
@@ -83,24 +81,22 @@ export function ProcessesDataTableToolbar({
           </SelectContent>
         </Select>
 
-        {isAdmin && (
-          <Select
-            value={ownerId || "all"}
-            onValueChange={(value) => setOwnerId(value === "all" ? "" : value)}
-          >
-            <SelectTrigger className="h-9 w-[180px]">
-              <SelectValue placeholder="Responsável" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os Responsáveis</SelectItem>
-              {users.map((user) => (
-                <SelectItem key={user.id} value={user.id}>
-                  {user.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
+        <Select
+          value={ownerId || "all"}
+          onValueChange={(value) => setOwnerId(value === "all" ? "" : value)}
+        >
+          <SelectTrigger className="h-9 w-[180px]">
+            <SelectValue placeholder="Responsável" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os Responsáveis</SelectItem>
+            {users.map((user) => (
+              <SelectItem key={user.id} value={user.id}>
+                {user.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         {isFiltered && (
           <Button
