@@ -12,9 +12,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { searchParser, statusParser } from "./processes-search-params";
+import {
+  ownerIdParser,
+  searchParser,
+  statusParser,
+} from "./processes-search-params";
 
-export function ProcessesDataTableToolbar() {
+interface UserOption {
+  id: string;
+  name: string;
+}
+
+interface ProcessesDataTableToolbarProps {
+  users: UserOption[];
+  isAdmin?: boolean;
+}
+
+export function ProcessesDataTableToolbar({
+  users,
+  isAdmin = false,
+}: ProcessesDataTableToolbarProps) {
   const [isPending, startTransition] = useTransition();
 
   const [search, setSearch] = useQueryState(
@@ -27,7 +44,12 @@ export function ProcessesDataTableToolbar() {
     statusParser.withOptions({ shallow: false, startTransition }),
   );
 
-  const isFiltered = search !== "" || status !== "";
+  const [ownerId, setOwnerId] = useQueryState(
+    "ownerId",
+    ownerIdParser.withOptions({ shallow: false, startTransition }),
+  );
+
+  const isFiltered = search !== "" || status !== "" || ownerId !== "";
 
   return (
     <div className="flex items-center justify-between">
@@ -61,12 +83,32 @@ export function ProcessesDataTableToolbar() {
           </SelectContent>
         </Select>
 
+        {isAdmin && (
+          <Select
+            value={ownerId || "all"}
+            onValueChange={(value) => setOwnerId(value === "all" ? "" : value)}
+          >
+            <SelectTrigger className="h-9 w-[180px]">
+              <SelectValue placeholder="Responsável" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os Responsáveis</SelectItem>
+              {users.map((user) => (
+                <SelectItem key={user.id} value={user.id}>
+                  {user.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
         {isFiltered && (
           <Button
             variant="ghost"
             onClick={() => {
               setSearch("");
               setStatus("");
+              setOwnerId("");
             }}
             className="h-8 px-2 lg:px-3"
           >

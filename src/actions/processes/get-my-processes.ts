@@ -8,15 +8,9 @@ import {
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
 import { prisma } from "@/lib/prisma";
-import type { ProcessStatus } from "@/lib/prisma/generated/enums";
+import type { ProcessBase } from "./process-types";
 
-export type MyProcessItem = {
-  id: string;
-  number: string;
-  description: string;
-  status: "OPEN" | "FINISHED" | "EXTERNAL";
-  createdAt: Date;
-};
+export type MyProcessItem = ProcessBase;
 
 export interface GetMyProcessesParams {
   page?: number;
@@ -41,36 +35,52 @@ export const getMyProcesses = withPermissions(
       const orderBy = params?.orderBy ?? "createdAt";
       const order = params?.order ?? "desc";
 
-      type ProcessWhereInput = NonNullable<
-        Parameters<typeof prisma.process.count>[0]
-      >["where"];
-
-      const whereClause: ProcessWhereInput = {
-        ownerId: session.user.id, // Strictly filter by the current session user
+      const where: Record<string, unknown> = {
+        ownerId: session.user.id,
       };
 
       if (search) {
-        whereClause.OR = [
+        where.OR = [
           { number: { contains: search, mode: "insensitive" } },
           { description: { contains: search, mode: "insensitive" } },
         ];
       }
 
       if (status && status !== "all") {
-        whereClause.status = status as ProcessStatus;
+        where.status = status;
       }
 
-      const [totalCount, processes] = await prisma.$transaction([
-        prisma.process.count({ where: whereClause }),
-        prisma.process.findMany({
-          where: whereClause,
-          orderBy: {
-            [orderBy]: order,
+      const totalCount = await prisma.process.count({ where });
+
+      const validOrderByFields = [
+        "createdAt",
+        "updatedAt",
+        "number",
+        "description",
+        "status",
+      ];
+      const safeOrderBy = validOrderByFields.includes(orderBy)
+        ? orderBy
+        : "createdAt";
+
+      const processes = await prisma.process.findMany({
+        where,
+        include: {
+          owner: {
+            select: {
+              name: true,
+              sector: {
+                select: { name: true },
+              },
+            },
           },
-          skip: (page - 1) * pageSize,
-          take: pageSize,
-        }),
-      ]);
+        },
+        orderBy: {
+          [safeOrderBy]: order,
+        },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      });
 
       const pageCount = Math.ceil(totalCount / pageSize);
 
@@ -79,6 +89,9 @@ export const getMyProcesses = withPermissions(
         number: proc.number,
         description: proc.description,
         status: proc.status as MyProcessItem["status"],
+        ownerId: proc.ownerId,
+        ownerName: proc.owner?.name ?? null,
+        ownerSectorName: proc.owner?.sector?.name ?? null,
         createdAt: proc.createdAt,
       }));
 
@@ -90,9 +103,7 @@ export const getMyProcesses = withPermissions(
       });
     } catch (error) {
       console.error("Erro ao buscar meus processos:", error);
-      return createErrorResponse(
-        "Erro interno do servidor ao buscar seus processos",
-      );
+      return createErrorResponse("Erro interno ao buscar processos");
     }
   },
 );

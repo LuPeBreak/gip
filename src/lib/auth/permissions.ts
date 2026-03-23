@@ -8,21 +8,24 @@ import {
 const statement = {
   ...defaultStatements,
   sector: ["create", "list", "update", "delete"],
-  process: ["create", "list", "update", "delete"],
+  process: ["create", "list", "update", "delete", "delete_own"],
 } as const;
 
 export const ac = createAccessControl(statement);
 
-export const admin = ac.newRole({
-  ...adminAc.statements,
-  sector: ["create", "list", "update", "delete"],
-  process: ["create", "list", "update", "delete"],
-});
+export const roles = {
+  admin: ac.newRole({
+    ...adminAc.statements,
+    sector: ["create", "list", "update", "delete"],
+    process: ["create", "list", "update", "delete", "delete_own"],
+  }),
+  user: ac.newRole({
+    ...userAc.statements,
+    process: ["create", "list", "delete_own"],
+  }),
+} as const;
 
-export const user = ac.newRole({
-  ...userAc.statements,
-  process: ["create", "list"], // Users can create and list processes they own/interact with
-});
+export type RoleKey = keyof typeof roles;
 
 export interface PermissionOption {
   resource: string;

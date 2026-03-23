@@ -1,7 +1,11 @@
 "use client";
 
-import { Edit, FolderOpen, MoreHorizontal } from "lucide-react";
+import { Edit, Eye, FolderOpen, MoreHorizontal, Trash } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import type { ProcessItem } from "@/actions/processes/get-processes";
+import { DeleteProcessDialog } from "@/components/dashboard/processes/delete-process-dialog";
+import { ProcessDialog } from "@/components/dashboard/processes/process-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth/auth-client";
+import type { RoleKey } from "@/lib/auth/permissions";
 
 interface ProcessesDataTableRowActionsProps {
   processData: ProcessItem;
@@ -19,47 +24,83 @@ export function ProcessesDataTableRowActions({
   processData,
 }: ProcessesDataTableRowActionsProps) {
   const { data: session } = authClient.useSession();
-  const userRole = session?.user.role;
+  const userRole = (session?.user.role as RoleKey) ?? "user";
 
-  const isAdmin = authClient.admin.checkRolePermission({
+  const canEdit = authClient.admin.checkRolePermission({
     permissions: { process: ["update"] },
-    role: (userRole ?? "user") as "admin" | "user",
+    role: userRole,
+  });
+
+  const canDelete = authClient.admin.checkRolePermission({
+    permissions: { process: ["delete"] },
+    role: userRole,
   });
 
   const isFinished = processData.status === "FINISHED";
-
-  // In "All Processes", we only want to allow:
-  // 1. Reopening archived processes
-  // 2. Editing if the user is an admin
+  const isOpen = processData.status === "OPEN";
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const canReopen = isFinished;
-  const canEdit = isAdmin;
-
-  if (!canReopen && !canEdit) return null;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex h-8 w-8 p-0">
-          <MoreHorizontal className="h-4 w-4" />
-          <span className="sr-only">Abrir menu</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[180px]">
-        {canReopen && (
-          <DropdownMenuItem>
-            <FolderOpen className="mr-2 h-4 w-4" />
-            Reabrir Processo
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="flex h-8 w-8 p-0">
+            <MoreHorizontal className="h-4 w-4" />
+            <span className="sr-only">Abrir menu</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-[180px]">
+          <DropdownMenuItem asChild>
+            <Link href={`/dashboard/processes/${processData.id}`}>
+              <Eye className="mr-2 h-4 w-4" />
+              Ver detalhes
+            </Link>
           </DropdownMenuItem>
-        )}
 
-        {canEdit && (
-          <DropdownMenuItem>
-            <Edit className="mr-2 h-4 w-4" />
-            Editar Processo
-          </DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          {canReopen && (
+            <DropdownMenuItem>
+              <FolderOpen className="mr-2 h-4 w-4" />
+              Reabrir Processo
+            </DropdownMenuItem>
+          )}
+
+          {canEdit && (
+            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
+              <Edit className="mr-2 h-4 w-4" />
+              Editar Processo
+            </DropdownMenuItem>
+          )}
+
+          {canDelete && isOpen && (
+            <DropdownMenuItem
+              onClick={() => setShowDeleteDialog(true)}
+              className="text-destructive"
+            >
+              <Trash className="mr-2 h-4 w-4" />
+              Excluir
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {canEdit && (
+        <ProcessDialog
+          process={processData}
+          open={showEditDialog}
+          onOpenChange={setShowEditDialog}
+        />
+      )}
+
+      {canDelete && isOpen && (
+        <DeleteProcessDialog
+          process={processData}
+          open={showDeleteDialog}
+          onOpenChange={setShowDeleteDialog}
+        />
+      )}
+    </>
   );
 }

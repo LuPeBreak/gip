@@ -8,12 +8,14 @@ import {
 } from "@/components/data-table/data-table-base-search-params";
 
 export const statusParser = parseAsString.withDefault("");
+export const ownerIdParser = parseAsString.withDefault("");
 
 export const processesSearchParamsCache = createSearchParamsCache({
   page: pageParser,
   pageSize: pageSizeParser,
   search: searchParser,
   status: statusParser,
+  ownerId: ownerIdParser,
   orderBy: orderByParser,
   order: orderParser,
 });

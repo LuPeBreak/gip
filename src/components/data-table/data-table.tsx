@@ -49,14 +49,15 @@ export function DataTable<TData, TValue>({
         {tableActions && <div className="ml-auto">{tableActions}</div>}
       </div>
 
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border overflow-hidden">
+        <Table style={{ tableLayout: "fixed" }}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
+                  const width = header.column.getSize();
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} style={{ width }}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -77,7 +78,10 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      style={{ width: cell.column.getSize() }}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),

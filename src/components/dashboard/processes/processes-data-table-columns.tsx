@@ -60,7 +60,7 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
   {
     accessorKey: "createdAt",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Criado em" />
+      <DataTableColumnHeader column={column} title="Cadastrado em" />
     ),
     cell: ({ row }) => {
       const date = row.original.createdAt;

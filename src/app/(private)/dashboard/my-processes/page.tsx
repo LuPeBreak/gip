@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { SearchParams } from "nuqs/server";
 import { getMyProcesses } from "@/actions/processes/get-my-processes";
+import { CreateProcessButton } from "@/components/dashboard/my-processes/create-process-button";
 import { myProcessesColumns } from "@/components/dashboard/my-processes/my-processes-data-table-columns";
 import { MyProcessesDataTableToolbar } from "@/components/dashboard/my-processes/my-processes-data-table-toolbar";
 import { processesSearchParamsCache } from "@/components/dashboard/my-processes/my-processes-search-params";
@@ -59,6 +60,7 @@ export default async function MyProcessesPage({
         pageCount={pageCount}
         totalCount={totalCount}
         toolbar={<MyProcessesDataTableToolbar />}
+        tableActions={<CreateProcessButton />}
       />
     </DashboardPageWrapper>
   );

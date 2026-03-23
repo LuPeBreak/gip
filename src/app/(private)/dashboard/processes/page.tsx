@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { SearchParams } from "nuqs/server";
 import { getAllProcesses } from "@/actions/processes/get-processes";
+import { getAllUserOptions } from "@/actions/users/get-all-user-options";
 import { processesColumns } from "@/components/dashboard/processes/processes-data-table-columns";
 import { ProcessesDataTableToolbar } from "@/components/dashboard/processes/processes-data-table-toolbar";
 import { processesSearchParamsCache } from "@/components/dashboard/processes/processes-search-params";
@@ -25,27 +26,39 @@ export default async function ProcessesPage({
   }
 
   const sp = await searchParams;
-  const { page, pageSize, search, status, orderBy, order } =
+  const { page, pageSize, search, status, ownerId, orderBy, order } =
     processesSearchParamsCache.parse(sp);
 
-  // No ownerId filter: lists all processes in the system
-  const response = await getAllProcesses({
-    page,
-    pageSize,
-    search,
-    status,
-    orderBy,
-    order: order as "asc" | "desc",
-  });
+  const isAdmin = session.user.role === "admin";
+
+  const [processesResponse, usersResponse] = await Promise.all([
+    getAllProcesses({
+      page,
+      pageSize,
+      search,
+      status,
+      ownerId: ownerId || undefined,
+      orderBy,
+      order: order as "asc" | "desc",
+    }),
+    isAdmin ? getAllUserOptions() : { success: true, data: [] },
+  ]);
 
   const processes =
-    response.success && response.data?.data ? response.data.data : [];
+    processesResponse.success && processesResponse.data?.data
+      ? processesResponse.data.data
+      : [];
   const pageCount =
-    response.success && response.data?.pageCount ? response.data.pageCount : 0;
-  const totalCount =
-    response.success && response.data?.totalCount
-      ? response.data.totalCount
+    processesResponse.success && processesResponse.data?.pageCount
+      ? processesResponse.data.pageCount
       : 0;
+  const totalCount =
+    processesResponse.success && processesResponse.data?.totalCount
+      ? processesResponse.data.totalCount
+      : 0;
+
+  const users =
+    usersResponse.success && usersResponse.data ? usersResponse.data : [];
 
   return (
     <DashboardPageWrapper
@@ -57,7 +70,7 @@ export default async function ProcessesPage({
         data={processes}
         pageCount={pageCount}
         totalCount={totalCount}
-        toolbar={<ProcessesDataTableToolbar />}
+        toolbar={<ProcessesDataTableToolbar users={users} isAdmin={isAdmin} />}
       />
     </DashboardPageWrapper>
   );

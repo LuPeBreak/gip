@@ -7,23 +7,16 @@ import {
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
 import { prisma } from "@/lib/prisma";
-import type { ProcessStatus } from "@/lib/prisma/generated/enums";
-export type ProcessItem = {
-  id: string;
-  number: string;
-  description: string;
-  status: "OPEN" | "FINISHED" | "EXTERNAL";
-  ownerId: string | null;
-  ownerName?: string | null;
-  ownerSectorName?: string | null;
-  createdAt: Date;
-};
+import type { ProcessBase } from "./process-types";
+
+export type ProcessItem = ProcessBase;
 
 export interface GetAllProcessesParams {
   page?: number;
   pageSize?: number;
   search?: string;
   status?: string;
+  ownerId?: string;
   orderBy?: string;
   order?: "asc" | "desc";
 }
@@ -42,43 +35,54 @@ export const getAllProcesses = withPermissions(
       const orderBy = params?.orderBy ?? "createdAt";
       const order = params?.order ?? "desc";
 
-      type ProcessWhereInput = NonNullable<
-        Parameters<typeof prisma.process.count>[0]
-      >["where"];
-      const whereClause: ProcessWhereInput = {};
+      const where: Record<string, unknown> = {};
 
       if (search) {
-        whereClause.OR = [
+        where.OR = [
           { number: { contains: search, mode: "insensitive" } },
           { description: { contains: search, mode: "insensitive" } },
         ];
       }
 
       if (status && status !== "all") {
-        whereClause.status = status as ProcessStatus;
+        where.status = status;
       }
 
-      const [totalCount, processes] = await prisma.$transaction([
-        prisma.process.count({ where: whereClause }),
-        prisma.process.findMany({
-          where: whereClause,
-          include: {
-            owner: {
-              select: {
-                name: true,
-                sector: {
-                  select: { name: true },
-                },
+      if (params?.ownerId) {
+        where.ownerId = params.ownerId;
+      }
+
+      const totalCount = await prisma.process.count({ where });
+
+      const validOrderByFields = [
+        "createdAt",
+        "updatedAt",
+        "number",
+        "description",
+        "status",
+      ];
+      const safeOrderBy = validOrderByFields.includes(orderBy)
+        ? orderBy
+        : "createdAt";
+
+      const processes = await prisma.process.findMany({
+        where,
+        include: {
+          owner: {
+            select: {
+              name: true,
+              sector: {
+                select: { name: true },
               },
             },
           },
-          orderBy: {
-            [orderBy]: order,
-          },
-          skip: (page - 1) * pageSize,
-          take: pageSize,
-        }),
-      ]);
+        },
+        orderBy: {
+          [safeOrderBy]: order,
+        },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      });
 
       const pageCount = Math.ceil(totalCount / pageSize);
 
@@ -88,8 +92,8 @@ export const getAllProcesses = withPermissions(
         description: proc.description,
         status: proc.status as ProcessItem["status"],
         ownerId: proc.ownerId,
-        ownerName: proc.owner?.name,
-        ownerSectorName: proc.owner?.sector?.name,
+        ownerName: proc.owner?.name ?? null,
+        ownerSectorName: proc.owner?.sector?.name ?? null,
         createdAt: proc.createdAt,
       }));
 
@@ -101,9 +105,7 @@ export const getAllProcesses = withPermissions(
       });
     } catch (error) {
       console.error("Erro ao buscar todos os processos:", error);
-      return createErrorResponse(
-        "Erro interno do servidor ao buscar processos",
-      );
+      return createErrorResponse("Erro interno ao buscar processos");
     }
   },
 );
