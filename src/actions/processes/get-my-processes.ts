@@ -93,6 +93,9 @@ export const getMyProcesses = withPermissions(
         ownerName: proc.owner?.name ?? null,
         ownerSectorName: proc.owner?.sector?.name ?? null,
         createdAt: proc.createdAt,
+        pendingTransferToUserId: proc.pendingTransferToUserId,
+        pendingTransferObservation: proc.pendingTransferObservation,
+        pendingTransferCreatedAt: proc.pendingTransferCreatedAt,
       }));
 
       return createSuccessResponse({

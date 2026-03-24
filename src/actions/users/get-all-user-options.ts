@@ -18,6 +18,9 @@ export const getAllUserOptions = withPermissions(
   async (): Promise<ActionResponse<UserOption[]>> => {
     try {
       const users = await prisma.user.findMany({
+        where: {
+          OR: [{ banned: false }, { banned: null }],
+        },
         select: {
           id: true,
           name: true,

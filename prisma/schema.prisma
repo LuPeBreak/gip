@@ -98,7 +98,6 @@ model Sector {
 enum ProcessStatus {
   OPEN
   FINISHED
-  EXTERNAL
 }
 
 model Process {
@@ -110,8 +109,24 @@ model Process {
   ownerId String?
   owner   User?   @relation("ProcessOwner", fields: [ownerId], references: [id], onDelete: Restrict)
 
+  pendingTransferToUserId       String?
+  pendingTransferObservation    String?
+  pendingTransferCreatedAt     DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("process")
 }
+
+// TODO: Futuro - Histórico de movimentações
+// model Movement {
+//   id        String       @id @default(cuid())
+//   processId String
+//   process   Process      @relation(fields: [processId], references: [id], onDelete: Cascade)
+//   type      MovementType
+//   fromUserId String?
+//   toUserId   String?
+//   observation String?
+//   createdAt  DateTime    @default(now())
+// }

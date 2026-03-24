@@ -1,4 +1,4 @@
-export type ProcessStatus = "OPEN" | "FINISHED" | "EXTERNAL";
+export type ProcessStatus = "OPEN" | "FINISHED";
 
 export type ProcessBase = {
   id: string;
@@ -10,6 +10,9 @@ export type ProcessBase = {
   ownerSectorName: string | null;
   createdAt: Date;
   updatedAt?: Date;
+  pendingTransferToUserId?: string | null;
+  pendingTransferObservation?: string | null;
+  pendingTransferCreatedAt?: Date | null;
 };
 
 export function formatProcessOwner(

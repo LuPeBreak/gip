@@ -1,12 +1,22 @@
 "use client";
 
-import { CheckCircle2, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
+import {
+  CheckCircle2,
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Send,
+  Trash,
+  XCircle,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { MyProcessItem } from "@/actions/processes/get-my-processes";
+import { CancelTransferDialog } from "@/components/dashboard/processes/cancel-transfer-dialog";
 import { DeleteProcessDialog } from "@/components/dashboard/processes/delete-process-dialog";
 import { FinishProcessDialog } from "@/components/dashboard/processes/finish-process-dialog";
 import { ProcessDialog } from "@/components/dashboard/processes/process-dialog";
+import { SendTransferDialog } from "@/components/dashboard/processes/send-transfer-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -56,6 +66,8 @@ export function MyProcessesDataTableRowActions({
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showFinishDialog, setShowFinishDialog] = useState(false);
+  const [showTransferDialog, setShowTransferDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   return (
     <>
@@ -74,12 +86,28 @@ export function MyProcessesDataTableRowActions({
             </Link>
           </DropdownMenuItem>
 
-          {canFinish && isOpen && (
+          {canFinish && isOpen && !processData.pendingTransferToUserId && (
             <DropdownMenuItem onClick={() => setShowFinishDialog(true)}>
               <CheckCircle2 className="mr-2 h-4 w-4" />
               Finalizar Processo
             </DropdownMenuItem>
           )}
+
+          {isOpen && !processData.pendingTransferToUserId && (
+            <DropdownMenuItem onClick={() => setShowTransferDialog(true)}>
+              <Send className="mr-2 h-4 w-4" />
+              Enviar Transferência
+            </DropdownMenuItem>
+          )}
+
+          {isOpen &&
+            processData.pendingTransferToUserId &&
+            processData.ownerId === session?.user.id && (
+              <DropdownMenuItem onClick={() => setShowCancelDialog(true)}>
+                <XCircle className="mr-2 h-4 w-4" />
+                Cancelar Transferência
+              </DropdownMenuItem>
+            )}
 
           {canEdit && (
             <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
@@ -123,6 +151,24 @@ export function MyProcessesDataTableRowActions({
           onOpenChange={setShowFinishDialog}
         />
       )}
+
+      {isOpen && !processData.pendingTransferToUserId && (
+        <SendTransferDialog
+          process={processData}
+          open={showTransferDialog}
+          onOpenChange={setShowTransferDialog}
+        />
+      )}
+
+      {isOpen &&
+        processData.pendingTransferToUserId &&
+        processData.ownerId === session?.user.id && (
+          <CancelTransferDialog
+            process={processData}
+            open={showCancelDialog}
+            onOpenChange={setShowCancelDialog}
+          />
+        )}
     </>
   );
 }
