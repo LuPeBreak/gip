@@ -1,10 +1,11 @@
 "use client";
 
-import { Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
+import { CheckCircle2, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { MyProcessItem } from "@/actions/processes/get-my-processes";
 import { DeleteProcessDialog } from "@/components/dashboard/processes/delete-process-dialog";
+import { FinishProcessDialog } from "@/components/dashboard/processes/finish-process-dialog";
 import { ProcessDialog } from "@/components/dashboard/processes/process-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,11 @@ export function MyProcessesDataTableRowActions({
 }: MyProcessesDataTableRowActionsProps) {
   const { data: session } = authClient.useSession();
   const userRole = (session?.user.role as RoleKey) ?? "user";
+
+  const canFinish = authClient.admin.checkRolePermission({
+    permissions: { process: ["finish"] },
+    role: userRole,
+  });
 
   const canEdit = authClient.admin.checkRolePermission({
     permissions: { process: ["update"] },
@@ -49,6 +55,7 @@ export function MyProcessesDataTableRowActions({
 
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showFinishDialog, setShowFinishDialog] = useState(false);
 
   return (
     <>
@@ -66,6 +73,13 @@ export function MyProcessesDataTableRowActions({
               Ver detalhes
             </Link>
           </DropdownMenuItem>
+
+          {canFinish && isOpen && (
+            <DropdownMenuItem onClick={() => setShowFinishDialog(true)}>
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+              Finalizar Processo
+            </DropdownMenuItem>
+          )}
 
           {canEdit && (
             <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
@@ -99,6 +113,14 @@ export function MyProcessesDataTableRowActions({
           process={processData}
           open={showDeleteDialog}
           onOpenChange={setShowDeleteDialog}
+        />
+      )}
+
+      {canFinish && isOpen && (
+        <FinishProcessDialog
+          process={processData}
+          open={showFinishDialog}
+          onOpenChange={setShowFinishDialog}
         />
       )}
     </>

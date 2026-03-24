@@ -8,7 +8,16 @@ import {
 const statement = {
   ...defaultStatements,
   sector: ["create", "list", "update", "delete"],
-  process: ["create", "list", "update", "delete", "delete_own"],
+  process: [
+    "create",
+    "list",
+    "update",
+    "delete",
+    "delete_own",
+    "finish",
+    "reopen",
+    "transfer",
+  ],
   user: [...defaultStatements.user, "list_minimal"],
 } as const;
 
@@ -18,12 +27,21 @@ export const roles = {
   admin: ac.newRole({
     ...adminAc.statements,
     sector: ["create", "list", "update", "delete"],
-    process: ["create", "list", "update", "delete", "delete_own"],
+    process: [
+      "create",
+      "list",
+      "update",
+      "delete",
+      "delete_own",
+      "finish",
+      "reopen",
+      "transfer",
+    ],
     user: [...defaultStatements.user, "list_minimal"],
   }),
   user: ac.newRole({
     ...userAc.statements,
-    process: ["create", "list", "delete_own"],
+    process: ["create", "list", "delete_own", "finish", "reopen", "transfer"],
     user: ["list_minimal"],
   }),
 } as const;

@@ -1,11 +1,12 @@
 "use client";
 
-import { Edit, Eye, FolderOpen, MoreHorizontal, Trash } from "lucide-react";
+import { Edit, Eye, MoreHorizontal, RotateCcw, Trash } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import type { ProcessItem } from "@/actions/processes/get-processes";
 import { DeleteProcessDialog } from "@/components/dashboard/processes/delete-process-dialog";
 import { ProcessDialog } from "@/components/dashboard/processes/process-dialog";
+import { ReopenProcessDialog } from "@/components/dashboard/processes/reopen-process-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -40,8 +41,12 @@ export function ProcessesDataTableRowActions({
   const isOpen = processData.status === "OPEN";
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showReopenDialog, setShowReopenDialog] = useState(false);
 
-  const canReopen = isFinished;
+  const canReopen = authClient.admin.checkRolePermission({
+    permissions: { process: ["reopen"] },
+    role: userRole,
+  });
 
   return (
     <>
@@ -60,9 +65,9 @@ export function ProcessesDataTableRowActions({
             </Link>
           </DropdownMenuItem>
 
-          {canReopen && (
-            <DropdownMenuItem>
-              <FolderOpen className="mr-2 h-4 w-4" />
+          {canReopen && isFinished && (
+            <DropdownMenuItem onClick={() => setShowReopenDialog(true)}>
+              <RotateCcw className="mr-2 h-4 w-4" />
               Reabrir Processo
             </DropdownMenuItem>
           )}
@@ -99,6 +104,14 @@ export function ProcessesDataTableRowActions({
           process={processData}
           open={showDeleteDialog}
           onOpenChange={setShowDeleteDialog}
+        />
+      )}
+
+      {canReopen && (
+        <ReopenProcessDialog
+          process={processData}
+          open={showReopenDialog}
+          onOpenChange={setShowReopenDialog}
         />
       )}
     </>

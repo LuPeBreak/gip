@@ -18,12 +18,16 @@ O conceito central do sistema é a **POSSE**. Um processo só pode ser manipulad
     - Ao ser criado, o processo nasce na posse do usuário criador com status `ABERTO`.
 - **[RN-002] Finalização de Processos:**
     - Apenas o usuário que detém a posse atual de um processo `ABERTO` pode finalizá-lo.
-    - Processos finalizados permanecem na posse do usuário que os finalizou.
+    - Ao finalizar, o processo **perde a posse** (ownerId = null), tornando-se órfão.
+    - Objetivo: simular o arquivamento real - quem finalizou não quer mais responsabilidade.
 - **[RN-003] Reabertura de Processos:**
-    - Apenas o usuário que detém a posse de um processo `FINALIZADO` pode reabri-lo.
-    - O processo retorna ao status `ABERTO` e permanece na posse do mesmo usuário.
-- **[RN-004] Exclusividade de Ação:**
-    - É vedada qualquer ação de movimentação, finalização ou envio externo em processos que **não** estejam na posse do usuário logado, exceto em casos de **Intervenção Administrativa** (ver [RN-017]).
+    - **Qualquer usuário** do sistema pode reabri-lo.
+    - Ao reabrir, o processo retorna ao status `ABERTO` e o usuário que reabriu **ganha a posse**.
+    - Objetivo: Processos órfãos podem ser retomados por qualquer um na tabela de processos finalizados.
+- **[RN-004] Exclusividade de Ação (com exceção):**
+    - É vedada qualquer ação de movimentação, finalização ou envio externo em processos que **não** estejam na posse do usuário logado, exceto:
+        1. **Intervenção Administrativa** (ver [RN-017])
+        2. **Reabertura de Processos** - qualquer usuário pode reabrir processos finalizados (órfãos).
 - **[RN-018] Exclusão de Processos:**
     - **Restrição Rígida:** Um processo **SÓ** pode ser excluído se **NÃO** possuir histórico de tramitação (movimentações), ou seja, se estiver na posse do criador e nunca tiver sido enviado.
     - Objetivo: Permitir corrigir erros de cadastro imediato (ex: erro de numeração).
