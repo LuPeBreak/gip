@@ -1,7 +1,9 @@
 import { Calendar, FileText, History, User } from "lucide-react";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProcessById } from "@/actions/processes/get-process-by-id";
+import { ProcessDetailAdminActions } from "@/components/dashboard/processes/process-detail-admin-actions";
 import { DashboardPageWrapper } from "@/components/layout/dashboard-page-wrapper";
 import { ProcessStatusBadge } from "@/components/processes/process-status-badge";
 import {
@@ -21,6 +23,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { auth } from "@/lib/auth/auth";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("pt-BR", {
@@ -46,6 +49,19 @@ export default async function ProcessDetailsPage({
   if (!process) {
     notFound();
   }
+
+  const sessionHeaders = await headers();
+  const session = await auth.api.getSession({ headers: sessionHeaders });
+  const canIntervene = session?.user?.id
+    ? (
+        await auth.api.userHasPermission({
+          body: {
+            userId: session.user.id,
+            permissions: { process: ["intervene"] },
+          },
+        })
+      ).success
+    : false;
 
   return (
     <DashboardPageWrapper title={`Processo ${process.number}`}>
@@ -163,6 +179,8 @@ export default async function ProcessDetailsPage({
               </dl>
             </CardContent>
           </Card>
+
+          {canIntervene && <ProcessDetailAdminActions process={process} />}
 
           <Button variant="outline" asChild className="w-full">
             <Link href="/dashboard/processes">

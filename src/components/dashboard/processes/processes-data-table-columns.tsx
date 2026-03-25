@@ -64,7 +64,7 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
   {
     accessorKey: "location",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Localização" />
+      <DataTableColumnHeader column={column} title="Externo" />
     ),
     size: 150,
     cell: ({ row }) => {

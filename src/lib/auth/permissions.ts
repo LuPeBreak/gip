@@ -17,6 +17,7 @@ const statement = {
     "finish",
     "reopen",
     "transfer",
+    "intervene",
   ],
   user: [...defaultStatements.user, "list_minimal"],
 } as const;
@@ -36,6 +37,7 @@ export const roles = {
       "finish",
       "reopen",
       "transfer",
+      "intervene",
     ],
     user: [...defaultStatements.user, "list_minimal"],
   }),

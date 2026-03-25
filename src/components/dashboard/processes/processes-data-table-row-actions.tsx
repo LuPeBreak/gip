@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowRightLeft,
   Edit,
   Eye,
   MapPinOff,
@@ -11,6 +12,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import type { ProcessItem } from "@/actions/processes/get-processes";
+import { AdminForceTransferDialog } from "@/components/dashboard/processes/admin-force-transfer-dialog";
 import { DeleteProcessDialog } from "@/components/dashboard/processes/delete-process-dialog";
 import { ProcessDialog } from "@/components/dashboard/processes/process-dialog";
 import { RecoverFromExternalDialog } from "@/components/dashboard/processes/recover-from-external-dialog";
@@ -22,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 import { authClient } from "@/lib/auth/auth-client";
 import type { RoleKey } from "@/lib/auth/permissions";
 
@@ -53,6 +56,7 @@ export function ProcessesDataTableRowActions({
   const [showReopenDialog, setShowReopenDialog] = useState(false);
   const [showRecoverExternalDialog, setShowRecoverExternalDialog] =
     useState(false);
+  const [showForceTransferDialog, setShowForceTransferDialog] = useState(false);
 
   const canReopen = authClient.admin.checkRolePermission({
     permissions: { process: ["reopen"] },
@@ -61,6 +65,11 @@ export function ProcessesDataTableRowActions({
 
   const canTransfer = authClient.admin.checkRolePermission({
     permissions: { process: ["transfer"] },
+    role: userRole,
+  });
+
+  const canIntervene = authClient.admin.checkRolePermission({
+    permissions: { process: ["intervene"] },
     role: userRole,
   });
 
@@ -95,6 +104,18 @@ export function ProcessesDataTableRowActions({
               <MapPinOff className="mr-2 h-4 w-4" />
               Recuperar de Externo
             </DropdownMenuItem>
+          )}
+
+          {canIntervene && !isFinished && (
+            <>
+              <Separator />
+              <DropdownMenuItem
+                onClick={() => setShowForceTransferDialog(true)}
+              >
+                <ArrowRightLeft className="mr-2 h-4 w-4" />
+                Transferência Forçada
+              </DropdownMenuItem>
+            </>
           )}
 
           {canEdit && (
@@ -145,6 +166,14 @@ export function ProcessesDataTableRowActions({
           process={processData}
           open={showRecoverExternalDialog}
           onOpenChange={setShowRecoverExternalDialog}
+        />
+      )}
+
+      {canIntervene && !isFinished && (
+        <AdminForceTransferDialog
+          process={processData}
+          open={showForceTransferDialog}
+          onOpenChange={setShowForceTransferDialog}
         />
       )}
     </>
