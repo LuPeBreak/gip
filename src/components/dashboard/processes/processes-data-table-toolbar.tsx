@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  locationFilterParser,
   ownerIdParser,
   searchParser,
   statusParser,
@@ -47,7 +48,13 @@ export function ProcessesDataTableToolbar({
     ownerIdParser.withOptions({ shallow: false, startTransition }),
   );
 
-  const isFiltered = search !== "" || status !== "" || ownerId !== "";
+  const [location, setLocation] = useQueryState(
+    "location",
+    locationFilterParser.withOptions({ shallow: false, startTransition }),
+  );
+
+  const isFiltered =
+    search !== "" || status !== "" || ownerId !== "" || location !== "";
 
   return (
     <div className="flex items-center justify-between">
@@ -77,7 +84,6 @@ export function ProcessesDataTableToolbar({
             <SelectItem value="all">Todos os Status</SelectItem>
             <SelectItem value="OPEN">Aberto</SelectItem>
             <SelectItem value="FINISHED">Finalizado / Arquivado</SelectItem>
-            <SelectItem value="EXTERNAL">Externo</SelectItem>
           </SelectContent>
         </Select>
 
@@ -98,6 +104,20 @@ export function ProcessesDataTableToolbar({
           </SelectContent>
         </Select>
 
+        <Select
+          value={location || "all"}
+          onValueChange={(value) => setLocation(value === "all" ? "" : value)}
+        >
+          <SelectTrigger className="h-9 w-[150px]">
+            <SelectValue placeholder="Localização" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas as Localizações</SelectItem>
+            <SelectItem value="internal">Interno</SelectItem>
+            <SelectItem value="external">Externo</SelectItem>
+          </SelectContent>
+        </Select>
+
         {isFiltered && (
           <Button
             variant="ghost"
@@ -105,6 +125,7 @@ export function ProcessesDataTableToolbar({
               setSearch("");
               setStatus("");
               setOwnerId("");
+              setLocation("");
             }}
             className="h-8 px-2 lg:px-3"
           >

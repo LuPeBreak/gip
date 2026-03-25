@@ -55,6 +55,7 @@ export const sectorsColumns: ColumnDef<SectorColumn>[] = [
   },
   {
     id: "actions",
+    size: 50,
     cell: ({ row }) => <SectorsDataTableRowActions sector={row.original} />,
   },
 ];

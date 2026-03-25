@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   Edit,
   Eye,
+  MapPin,
   MoreHorizontal,
   Send,
   Trash,
@@ -16,6 +17,7 @@ import { CancelTransferDialog } from "@/components/dashboard/processes/cancel-tr
 import { DeleteProcessDialog } from "@/components/dashboard/processes/delete-process-dialog";
 import { FinishProcessDialog } from "@/components/dashboard/processes/finish-process-dialog";
 import { ProcessDialog } from "@/components/dashboard/processes/process-dialog";
+import { SendToExternalDialog } from "@/components/dashboard/processes/send-to-external-dialog";
 import { SendTransferDialog } from "@/components/dashboard/processes/send-transfer-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,12 +64,14 @@ export function MyProcessesDataTableRowActions({
   }, [session]);
 
   const isOpen = processData.status === "OPEN";
+  const isInternal = !processData.location;
 
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showFinishDialog, setShowFinishDialog] = useState(false);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showSendExternalDialog, setShowSendExternalDialog] = useState(false);
 
   return (
     <>
@@ -108,6 +112,13 @@ export function MyProcessesDataTableRowActions({
                 Cancelar Transferência
               </DropdownMenuItem>
             )}
+
+          {isOpen && isInternal && !processData.pendingTransferToUserId && (
+            <DropdownMenuItem onClick={() => setShowSendExternalDialog(true)}>
+              <MapPin className="mr-2 h-4 w-4" />
+              Enviar para Externo
+            </DropdownMenuItem>
+          )}
 
           {canEdit && (
             <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
@@ -169,6 +180,14 @@ export function MyProcessesDataTableRowActions({
             onOpenChange={setShowCancelDialog}
           />
         )}
+
+      {isOpen && isInternal && !processData.pendingTransferToUserId && (
+        <SendToExternalDialog
+          process={processData}
+          open={showSendExternalDialog}
+          onOpenChange={setShowSendExternalDialog}
+        />
+      )}
     </>
   );
 }

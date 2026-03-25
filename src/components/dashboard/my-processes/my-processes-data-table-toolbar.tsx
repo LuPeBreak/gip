@@ -5,14 +5,7 @@ import { useQueryState } from "nuqs";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { searchParser, statusParser } from "./my-processes-search-params";
+import { searchParser } from "./my-processes-search-params";
 
 export function MyProcessesDataTableToolbar() {
   const [isPending, startTransition] = useTransition();
@@ -22,12 +15,7 @@ export function MyProcessesDataTableToolbar() {
     searchParser.withOptions({ shallow: false, startTransition }),
   );
 
-  const [status, setStatus] = useQueryState(
-    "status",
-    statusParser.withOptions({ shallow: false, startTransition }),
-  );
-
-  const isFiltered = search !== "" || status !== "";
+  const isFiltered = search !== "";
 
   return (
     <div className="flex items-center justify-between">
@@ -46,27 +34,11 @@ export function MyProcessesDataTableToolbar() {
           data-pending={isPending ? "" : undefined}
         />
 
-        <Select
-          value={status || "all"}
-          onValueChange={(value) => setStatus(value === "all" ? "" : value)}
-        >
-          <SelectTrigger className="h-9 w-[150px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os Status</SelectItem>
-            <SelectItem value="OPEN">Aberto</SelectItem>
-            <SelectItem value="FINISHED">Finalizado / Arquivado</SelectItem>
-            <SelectItem value="EXTERNAL">Externo</SelectItem>
-          </SelectContent>
-        </Select>
-
         {isFiltered && (
           <Button
             variant="ghost"
             onClick={() => {
               setSearch("");
-              setStatus("");
             }}
             className="h-8 px-2 lg:px-3"
           >

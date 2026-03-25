@@ -13,6 +13,7 @@ export type ProcessBase = {
   pendingTransferToUserId?: string | null;
   pendingTransferObservation?: string | null;
   pendingTransferCreatedAt?: Date | null;
+  location?: string | null;
 };
 
 export function formatProcessOwner(

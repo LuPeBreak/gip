@@ -107,6 +107,7 @@ export const inboxColumns = [
   {
     id: "actions",
     header: "Ações",
+    size: 180,
     cell: ({ row }: { row: { original: InboxTransferItem } }) => {
       return <InboxTransferActions transfer={row.original} />;
     },

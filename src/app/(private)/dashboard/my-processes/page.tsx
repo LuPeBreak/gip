@@ -15,14 +15,13 @@ export default async function MyProcessesPage({
   searchParams,
 }: MyProcessesPageProps) {
   const sp = await searchParams;
-  const { page, pageSize, search, status, orderBy, order } =
+  const { page, pageSize, search, orderBy, order } =
     processesSearchParamsCache.parse(sp);
 
   const response = await getMyProcesses({
     page,
     pageSize,
     search,
-    status,
     orderBy,
     order: order as "asc" | "desc",
   });

@@ -59,12 +59,13 @@ O conceito central do sistema é a **POSSE**. Um processo só pode ser manipulad
 
 ### 2.3. Tramitação Externa
 - **[RN-008] Envio para Externo:**
-    - O usuário em posse de um processo pode enviá-lo para um setor externo (ex: Jurídico).
-    - O processo assume o status `EXTERNO` e a posse fica congelada.
+    - O usuário em posse de um processo pode envi-lo para um setor externo (ex: Jurídico).
+    - O processo continua com status OPEN ou FINISHED, mas um campo `location` indica onde está.
+    - A posse fica "congelada" - owner não pode transferir ou finalizar enquanto estiver externo.
 - **[RN-009] Recuperação de Externo:**
     - O sistema deve permitir "recuperar" um processo que está em setor externo.
-    - **Quem pode recuperar:** Apenas o usuário que enviou **OU** qualquer Administrador (ver [RN-017]).
-    - Ao recuperar, o usuário assume a posse do processo, trazendo-o de volta para o status `ABERTO`.
+    - **Quem pode recuperar:** Qualquer usuário com permissão de `transfer`.
+    - Ao recuperar, o usuário assume a posse do processo e `location` volta a ser null.
 
 ### 2.4. Administração e Gestão de Crise (Admin Override)
 - **[RN-017] Intervenção Administrativa:**
@@ -137,6 +138,6 @@ O conceito central do sistema é a **POSSE**. Um processo só pode ser manipulad
 
 - **Micro-Setor:** Subdivisão interna da Licitação (Etapa).
 - **Profile (Usuário):** Servidor com acesso ao sistema, vinculado a um micro-setor.
-- **Processo:** Entidade principal (`status`: `open`, `finished`, `external`).
+- **Processo:** Entidade principal (`status`: `open`, `finished`, `location`: local atual do processo).
 - **Movimentação (Tramite):** Registro da transferência de posse (`pending`, `accepted`, `rejected`, `system_audit`).
 - **Delete Constraint:** `ON DELETE RESTRICT` (Processos com movimentação não podem ser excluídos).

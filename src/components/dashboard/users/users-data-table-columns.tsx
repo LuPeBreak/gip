@@ -68,6 +68,7 @@ export const usersColumns: ColumnDef<UserColumn>[] = [
   },
   {
     id: "actions",
+    size: 50,
     cell: ({ row }) => <UsersDataTableRowActions user={row.original} />,
   },
 ];

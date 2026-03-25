@@ -1,4 +1,4 @@
-import { createSearchParamsCache, parseAsString } from "nuqs/server";
+import { createSearchParamsCache } from "nuqs/server";
 import {
   orderByParser,
   orderParser,
@@ -7,13 +7,10 @@ import {
   searchParser,
 } from "@/components/data-table/data-table-base-search-params";
 
-export const statusParser = parseAsString.withDefault("");
-
 export const processesSearchParamsCache = createSearchParamsCache({
   page: pageParser,
   pageSize: pageSizeParser,
   search: searchParser,
-  status: statusParser,
   orderBy: orderByParser,
   order: orderParser,
 });

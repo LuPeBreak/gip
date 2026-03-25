@@ -15,7 +15,7 @@ export default async function ProcessesPage({
   searchParams,
 }: ProcessesPageProps) {
   const sp = await searchParams;
-  const { page, pageSize, search, status, ownerId, orderBy, order } =
+  const { page, pageSize, search, status, location, ownerId, orderBy, order } =
     processesSearchParamsCache.parse(sp);
 
   const [processesResponse, usersResponse] = await Promise.all([
@@ -24,6 +24,7 @@ export default async function ProcessesPage({
       pageSize,
       search,
       status,
+      location,
       ownerId: ownerId || undefined,
       orderBy,
       order: order as "asc" | "desc",

@@ -16,7 +16,6 @@ export interface GetMyProcessesParams {
   page?: number;
   pageSize?: number;
   search?: string;
-  status?: string;
   orderBy?: string;
   order?: "asc" | "desc";
 }
@@ -31,7 +30,6 @@ export const getMyProcesses = withPermissions(
       const page = params?.page ?? 1;
       const pageSize = params?.pageSize ?? 15;
       const search = params?.search ?? "";
-      const status = params?.status ?? "";
       const orderBy = params?.orderBy ?? "createdAt";
       const order = params?.order ?? "desc";
 
@@ -44,10 +42,6 @@ export const getMyProcesses = withPermissions(
           { number: { contains: search, mode: "insensitive" } },
           { description: { contains: search, mode: "insensitive" } },
         ];
-      }
-
-      if (status && status !== "all") {
-        where.status = status;
       }
 
       const totalCount = await prisma.process.count({ where });
@@ -96,6 +90,7 @@ export const getMyProcesses = withPermissions(
         pendingTransferToUserId: proc.pendingTransferToUserId,
         pendingTransferObservation: proc.pendingTransferObservation,
         pendingTransferCreatedAt: proc.pendingTransferCreatedAt,
+        location: proc.location,
       }));
 
       return createSuccessResponse({

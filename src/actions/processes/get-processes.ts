@@ -16,6 +16,7 @@ export interface GetAllProcessesParams {
   pageSize?: number;
   search?: string;
   status?: string;
+  location?: string;
   ownerId?: string;
   orderBy?: string;
   order?: "asc" | "desc";
@@ -32,6 +33,7 @@ export const getAllProcesses = withPermissions(
       const pageSize = params?.pageSize ?? 15;
       const search = params?.search ?? "";
       const status = params?.status ?? "";
+      const location = params?.location ?? "";
       const orderBy = params?.orderBy ?? "createdAt";
       const order = params?.order ?? "desc";
 
@@ -46,6 +48,14 @@ export const getAllProcesses = withPermissions(
 
       if (status && status !== "all") {
         where.status = status;
+      }
+
+      if (location) {
+        if (location === "internal") {
+          where.location = null;
+        } else if (location === "external") {
+          where.location = { not: null };
+        }
       }
 
       if (params?.ownerId) {
@@ -95,6 +105,7 @@ export const getAllProcesses = withPermissions(
         ownerName: proc.owner?.name ?? null,
         ownerSectorName: proc.owner?.sector?.name ?? null,
         createdAt: proc.createdAt,
+        location: proc.location,
       }));
 
       return createSuccessResponse({

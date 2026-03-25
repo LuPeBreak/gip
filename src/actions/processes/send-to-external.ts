@@ -11,18 +11,19 @@ import { withPermissions } from "@/lib/actions/with-permissions";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 
-const finishProcessSchema = z.object({
-  id: z.string(),
+const sendToExternalSchema = z.object({
+  processId: z.string(),
+  location: z.string().min(1, "Localização é obrigatória"),
 });
 
-export const finishProcess = withPermissions(
-  [{ resource: "process", action: ["finish"] }],
+export const sendToExternal = withPermissions(
+  [{ resource: "process", action: ["transfer"] }],
   async (
     _session,
-    data: z.infer<typeof finishProcessSchema>,
+    data: z.infer<typeof sendToExternalSchema>,
   ): Promise<ActionResponse<void>> => {
     try {
-      const { id } = finishProcessSchema.parse(data);
+      const { processId, location } = sendToExternalSchema.parse(data);
 
       const sessionHeaders = await headers();
       const fullSession = await auth.api.getSession({
@@ -34,7 +35,7 @@ export const finishProcess = withPermissions(
       }
 
       const process = await prisma.process.findUnique({
-        where: { id },
+        where: { id: processId },
       });
 
       if (!process) {
@@ -43,15 +44,19 @@ export const finishProcess = withPermissions(
 
       if (process.status !== "OPEN") {
         return createErrorResponse(
-          "Apenas processos abertos podem ser finalizados.",
+          "Apenas processos abertos podem ser enviados para externo.",
         );
       }
 
-      const isOwner = process.ownerId === fullSession.user.id;
-
-      if (!isOwner) {
+      if (process.ownerId !== fullSession.user.id) {
         return createErrorResponse(
-          "Você só pode finalizar processos que estão sob sua posse.",
+          "Você só pode enviar processos que estão sob sua posse.",
+        );
+      }
+
+      if (process.location) {
+        return createErrorResponse(
+          "Este processo já está em localização externa.",
         );
       }
 
@@ -62,17 +67,17 @@ export const finishProcess = withPermissions(
       }
 
       await prisma.process.update({
-        where: { id },
+        where: { id: processId },
         data: {
-          status: "FINISHED",
+          location,
           ownerId: null,
         },
       });
 
       return createSuccessResponse();
     } catch (error) {
-      console.error("Erro ao finalizar processo:", error);
-      return createErrorResponse("Erro interno ao finalizar processo.");
+      console.error("Erro ao enviar para externo:", error);
+      return createErrorResponse("Erro interno ao enviar para externo.");
     }
   },
 );

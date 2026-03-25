@@ -113,6 +113,8 @@ model Process {
   pendingTransferObservation    String?
   pendingTransferCreatedAt     DateTime?
 
+  location String?  // null = interno, texto = externo
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

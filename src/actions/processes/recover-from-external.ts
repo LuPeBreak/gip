@@ -11,18 +11,18 @@ import { withPermissions } from "@/lib/actions/with-permissions";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 
-const finishProcessSchema = z.object({
-  id: z.string(),
+const recoverFromExternalSchema = z.object({
+  processId: z.string(),
 });
 
-export const finishProcess = withPermissions(
-  [{ resource: "process", action: ["finish"] }],
+export const recoverFromExternal = withPermissions(
+  [{ resource: "process", action: ["transfer"] }],
   async (
     _session,
-    data: z.infer<typeof finishProcessSchema>,
+    data: z.infer<typeof recoverFromExternalSchema>,
   ): Promise<ActionResponse<void>> => {
     try {
-      const { id } = finishProcessSchema.parse(data);
+      const { processId } = recoverFromExternalSchema.parse(data);
 
       const sessionHeaders = await headers();
       const fullSession = await auth.api.getSession({
@@ -34,24 +34,16 @@ export const finishProcess = withPermissions(
       }
 
       const process = await prisma.process.findUnique({
-        where: { id },
+        where: { id: processId },
       });
 
       if (!process) {
         return createErrorResponse("Processo não encontrado.");
       }
 
-      if (process.status !== "OPEN") {
+      if (!process.location) {
         return createErrorResponse(
-          "Apenas processos abertos podem ser finalizados.",
-        );
-      }
-
-      const isOwner = process.ownerId === fullSession.user.id;
-
-      if (!isOwner) {
-        return createErrorResponse(
-          "Você só pode finalizar processos que estão sob sua posse.",
+          "Este processo não está em localização externa.",
         );
       }
 
@@ -62,17 +54,17 @@ export const finishProcess = withPermissions(
       }
 
       await prisma.process.update({
-        where: { id },
+        where: { id: processId },
         data: {
-          status: "FINISHED",
-          ownerId: null,
+          location: null,
+          ownerId: fullSession.user.id,
         },
       });
 
       return createSuccessResponse();
     } catch (error) {
-      console.error("Erro ao finalizar processo:", error);
-      return createErrorResponse("Erro interno ao finalizar processo.");
+      console.error("Erro ao recuperar de externo:", error);
+      return createErrorResponse("Erro interno ao recuperar de externo.");
     }
   },
 );

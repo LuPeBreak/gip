@@ -1,11 +1,19 @@
 "use client";
 
-import { Edit, Eye, MoreHorizontal, RotateCcw, Trash } from "lucide-react";
+import {
+  Edit,
+  Eye,
+  MapPinOff,
+  MoreHorizontal,
+  RotateCcw,
+  Trash,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import type { ProcessItem } from "@/actions/processes/get-processes";
 import { DeleteProcessDialog } from "@/components/dashboard/processes/delete-process-dialog";
 import { ProcessDialog } from "@/components/dashboard/processes/process-dialog";
+import { RecoverFromExternalDialog } from "@/components/dashboard/processes/recover-from-external-dialog";
 import { ReopenProcessDialog } from "@/components/dashboard/processes/reopen-process-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,12 +47,20 @@ export function ProcessesDataTableRowActions({
 
   const isFinished = processData.status === "FINISHED";
   const isOpen = processData.status === "OPEN";
+  const isExternal = !!processData.location;
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showReopenDialog, setShowReopenDialog] = useState(false);
+  const [showRecoverExternalDialog, setShowRecoverExternalDialog] =
+    useState(false);
 
   const canReopen = authClient.admin.checkRolePermission({
     permissions: { process: ["reopen"] },
+    role: userRole,
+  });
+
+  const canTransfer = authClient.admin.checkRolePermission({
+    permissions: { process: ["transfer"] },
     role: userRole,
   });
 
@@ -69,6 +85,15 @@ export function ProcessesDataTableRowActions({
             <DropdownMenuItem onClick={() => setShowReopenDialog(true)}>
               <RotateCcw className="mr-2 h-4 w-4" />
               Reabrir Processo
+            </DropdownMenuItem>
+          )}
+
+          {canTransfer && isExternal && (
+            <DropdownMenuItem
+              onClick={() => setShowRecoverExternalDialog(true)}
+            >
+              <MapPinOff className="mr-2 h-4 w-4" />
+              Recuperar de Externo
             </DropdownMenuItem>
           )}
 
@@ -112,6 +137,14 @@ export function ProcessesDataTableRowActions({
           process={processData}
           open={showReopenDialog}
           onOpenChange={setShowReopenDialog}
+        />
+      )}
+
+      {canTransfer && isExternal && (
+        <RecoverFromExternalDialog
+          process={processData}
+          open={showRecoverExternalDialog}
+          onOpenChange={setShowRecoverExternalDialog}
         />
       )}
     </>
