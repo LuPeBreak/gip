@@ -14,7 +14,7 @@ import { prisma } from "@/lib/prisma";
 
 export const updateProcess = withPermissions(
   [{ resource: "process", action: ["update"] }],
-  async (_session, data: UpdateProcessData): Promise<ActionResponse<void>> => {
+  async (session, data: UpdateProcessData): Promise<ActionResponse<void>> => {
     try {
       const parsedData = updateProcessSchema.parse(data);
 
@@ -25,6 +25,9 @@ export const updateProcess = withPermissions(
       if (!existing) {
         return createErrorResponse("Processo não encontrado.");
       }
+
+      const oldNumber = existing.number;
+      const oldDescription = existing.description;
 
       const duplicate = await prisma.process.findUnique({
         where: { number: parsedData.number },
@@ -38,13 +41,47 @@ export const updateProcess = withPermissions(
         );
       }
 
-      await prisma.process.update({
-        where: { id: parsedData.id },
-        data: {
-          number: parsedData.number,
-          description: parsedData.description,
-        },
-      });
+      const fields: { name: string; from: string; to: string }[] = [];
+
+      if (oldNumber !== parsedData.number) {
+        fields.push({ name: "number", from: oldNumber, to: parsedData.number });
+      }
+
+      if (oldDescription !== parsedData.description) {
+        fields.push({
+          name: "description",
+          from: oldDescription,
+          to: parsedData.description,
+        });
+      }
+
+      if (fields.length > 0) {
+        await prisma.$transaction([
+          prisma.process.update({
+            where: { id: parsedData.id },
+            data: {
+              number: parsedData.number,
+              description: parsedData.description,
+            },
+          }),
+          prisma.processEvent.create({
+            data: {
+              processId: parsedData.id,
+              type: "DATA_EDITED",
+              actorId: session.user.id,
+              metadata: { fields },
+            },
+          }),
+        ]);
+      } else {
+        await prisma.process.update({
+          where: { id: parsedData.id },
+          data: {
+            number: parsedData.number,
+            description: parsedData.description,
+          },
+        });
+      }
 
       return createSuccessResponse();
     } catch (error) {

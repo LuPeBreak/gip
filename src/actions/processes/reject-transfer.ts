@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 import {
   type ActionResponse,
@@ -8,7 +7,6 @@ import {
   createSuccessResponse,
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
-import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 
 const rejectTransferSchema = z.object({
@@ -19,20 +17,11 @@ const rejectTransferSchema = z.object({
 export const rejectTransfer = withPermissions(
   [{ resource: "process", action: ["transfer"] }],
   async (
-    _session,
+    session,
     data: z.infer<typeof rejectTransferSchema>,
   ): Promise<ActionResponse<void>> => {
     try {
-      const { processId } = rejectTransferSchema.parse(data);
-
-      const sessionHeaders = await headers();
-      const fullSession = await auth.api.getSession({
-        headers: sessionHeaders,
-      });
-
-      if (!fullSession) {
-        return createErrorResponse("Sessão não encontrada.");
-      }
+      const { processId, reason } = rejectTransferSchema.parse(data);
 
       const process = await prisma.process.findUnique({
         where: { id: processId },
@@ -45,21 +34,33 @@ export const rejectTransfer = withPermissions(
         return createErrorResponse("Processo não encontrado.");
       }
 
-      if (process.pendingTransferToUserId !== fullSession.user.id) {
+      if (process.pendingTransferToUserId !== session.user.id) {
         return createErrorResponse(
           "Você só pode recusar transferências enviadas para você.",
         );
       }
 
-      await prisma.process.update({
-        where: { id: processId },
-        data: {
-          ownerId: process.ownerId,
-          pendingTransferToUserId: null,
-          pendingTransferObservation: null,
-          pendingTransferCreatedAt: null,
-        },
-      });
+      await prisma.$transaction([
+        prisma.process.update({
+          where: { id: processId },
+          data: {
+            ownerId: process.ownerId,
+            pendingTransferToUserId: null,
+            pendingTransferObservation: null,
+            pendingTransferCreatedAt: null,
+          },
+        }),
+        prisma.processEvent.create({
+          data: {
+            processId,
+            type: "TRANSFER_REJECTED",
+            actorId: session.user.id,
+            fromUserId: process.ownerId,
+            toUserId: session.user.id,
+            observation: reason || null,
+          },
+        }),
+      ]);
 
       return createSuccessResponse();
     } catch (error) {

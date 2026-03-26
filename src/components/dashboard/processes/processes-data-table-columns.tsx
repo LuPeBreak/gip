@@ -44,11 +44,7 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
       const sectorName = row.original.ownerSectorName;
 
       if (!ownerName) {
-        return (
-          <span className="italic text-muted-foreground">
-            Arquivo / Sem posse
-          </span>
-        );
+        return <span className="italic text-muted-foreground">___</span>;
       }
 
       return (

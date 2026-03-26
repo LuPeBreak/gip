@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 import {
   type ActionResponse,
@@ -8,7 +7,6 @@ import {
   createSuccessResponse,
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
-import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 
 const cancelTransferSchema = z.object({
@@ -18,20 +16,11 @@ const cancelTransferSchema = z.object({
 export const cancelTransfer = withPermissions(
   [{ resource: "process", action: ["transfer"] }],
   async (
-    _session,
+    session,
     data: z.infer<typeof cancelTransferSchema>,
   ): Promise<ActionResponse<void>> => {
     try {
       const { processId } = cancelTransferSchema.parse(data);
-
-      const sessionHeaders = await headers();
-      const fullSession = await auth.api.getSession({
-        headers: sessionHeaders,
-      });
-
-      if (!fullSession) {
-        return createErrorResponse("Sessão não encontrada.");
-      }
 
       const process = await prisma.process.findUnique({
         where: { id: processId },
@@ -41,7 +30,7 @@ export const cancelTransfer = withPermissions(
         return createErrorResponse("Processo não encontrado.");
       }
 
-      if (process.ownerId !== fullSession.user.id) {
+      if (process.ownerId !== session.user.id) {
         return createErrorResponse(
           "Você só pode cancelar transferências que você enviou.",
         );
@@ -53,14 +42,24 @@ export const cancelTransfer = withPermissions(
         );
       }
 
-      await prisma.process.update({
-        where: { id: processId },
-        data: {
-          pendingTransferToUserId: null,
-          pendingTransferObservation: null,
-          pendingTransferCreatedAt: null,
-        },
-      });
+      await prisma.$transaction([
+        prisma.process.update({
+          where: { id: processId },
+          data: {
+            pendingTransferToUserId: null,
+            pendingTransferObservation: null,
+            pendingTransferCreatedAt: null,
+          },
+        }),
+        prisma.processEvent.deleteMany({
+          where: {
+            processId,
+            type: "TRANSFER_SENT",
+            actorId: session.user.id,
+            toUserId: process.pendingTransferToUserId,
+          },
+        }),
+      ]);
 
       return createSuccessResponse();
     } catch (error) {

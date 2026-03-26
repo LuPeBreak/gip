@@ -30,13 +30,25 @@ export const createProcess = withPermissions(
         );
       }
 
-      await prisma.process.create({
-        data: {
-          number: parsedData.number,
-          description: parsedData.description,
-          ownerId: session.user.id,
-          status: "OPEN",
-        },
+      const _createdProcess = await prisma.$transaction(async (tx) => {
+        const process = await tx.process.create({
+          data: {
+            number: parsedData.number,
+            description: parsedData.description,
+            ownerId: session.user.id,
+            status: "OPEN",
+          },
+        });
+
+        await tx.processEvent.create({
+          data: {
+            processId: process.id,
+            type: "CREATED",
+            actorId: session.user.id,
+          },
+        });
+
+        return process;
       });
 
       return createSuccessResponse();

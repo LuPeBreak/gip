@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 import {
   type ActionResponse,
@@ -8,7 +7,6 @@ import {
   createSuccessResponse,
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
-import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 
 const finishProcessSchema = z.object({
@@ -18,20 +16,11 @@ const finishProcessSchema = z.object({
 export const finishProcess = withPermissions(
   [{ resource: "process", action: ["finish"] }],
   async (
-    _session,
+    session,
     data: z.infer<typeof finishProcessSchema>,
   ): Promise<ActionResponse<void>> => {
     try {
       const { id } = finishProcessSchema.parse(data);
-
-      const sessionHeaders = await headers();
-      const fullSession = await auth.api.getSession({
-        headers: sessionHeaders,
-      });
-
-      if (!fullSession) {
-        return createErrorResponse("Sessão não encontrada.");
-      }
 
       const process = await prisma.process.findUnique({
         where: { id },
@@ -47,7 +36,7 @@ export const finishProcess = withPermissions(
         );
       }
 
-      const isOwner = process.ownerId === fullSession.user.id;
+      const isOwner = process.ownerId === session.user.id;
 
       if (!isOwner) {
         return createErrorResponse(
@@ -61,13 +50,22 @@ export const finishProcess = withPermissions(
         );
       }
 
-      await prisma.process.update({
-        where: { id },
-        data: {
-          status: "FINISHED",
-          ownerId: null,
-        },
-      });
+      await prisma.$transaction([
+        prisma.process.update({
+          where: { id },
+          data: {
+            status: "FINISHED",
+            ownerId: null,
+          },
+        }),
+        prisma.processEvent.create({
+          data: {
+            processId: id,
+            type: "FINISHED",
+            actorId: session.user.id,
+          },
+        }),
+      ]);
 
       return createSuccessResponse();
     } catch (error) {

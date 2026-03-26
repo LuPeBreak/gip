@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 import {
   type ActionResponse,
@@ -8,7 +7,6 @@ import {
   createSuccessResponse,
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
-import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 
 const forceTransferSchema = z.object({
@@ -20,24 +18,12 @@ const forceTransferSchema = z.object({
 export const forceTransferProcess = withPermissions(
   [{ resource: "process", action: ["intervene"] }],
   async (
-    _session,
+    session,
     data: z.infer<typeof forceTransferSchema>,
   ): Promise<ActionResponse<void>> => {
     try {
-      const {
-        processId,
-        targetUserId,
-        reason: _reason,
-      } = forceTransferSchema.parse(data);
-
-      const sessionHeaders = await headers();
-      const fullSession = await auth.api.getSession({
-        headers: sessionHeaders,
-      });
-
-      if (!fullSession) {
-        return createErrorResponse("Sessão não encontrada.");
-      }
+      const { processId, targetUserId, reason } =
+        forceTransferSchema.parse(data);
 
       const process = await prisma.process.findUnique({
         where: { id: processId },
@@ -65,17 +51,31 @@ export const forceTransferProcess = withPermissions(
         return createErrorResponse("O processo já está com este usuário.");
       }
 
-      await prisma.process.update({
-        where: { id: processId },
-        data: {
-          ownerId: targetUserId,
-          status: "OPEN",
-          pendingTransferToUserId: null,
-          pendingTransferObservation: null,
-          pendingTransferCreatedAt: null,
-          location: null,
-        },
-      });
+      const isTakeOver = targetUserId === session.user.id;
+
+      await prisma.$transaction([
+        prisma.process.update({
+          where: { id: processId },
+          data: {
+            ownerId: targetUserId,
+            status: "OPEN",
+            pendingTransferToUserId: null,
+            pendingTransferObservation: null,
+            pendingTransferCreatedAt: null,
+            location: null,
+          },
+        }),
+        prisma.processEvent.create({
+          data: {
+            processId,
+            type: isTakeOver ? "ADMIN_TAKE_OVER" : "ADMIN_FORCE_TRANSFER",
+            actorId: session.user.id,
+            fromUserId: process.ownerId,
+            toUserId: targetUserId,
+            observation: reason,
+          },
+        }),
+      ]);
 
       return createSuccessResponse();
     } catch (error) {

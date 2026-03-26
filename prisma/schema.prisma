@@ -28,6 +28,10 @@ model User {
 
   ownedProcesses Process[] @relation("ProcessOwner")
 
+  actedEvents ProcessEvent[] @relation("ProcessEventActor")
+  fromEvents  ProcessEvent[] @relation("ProcessEventFrom")
+  toEvents    ProcessEvent[] @relation("ProcessEventTo")
+
   @@unique([email])
   @@map("user")
 }
@@ -100,6 +104,20 @@ enum ProcessStatus {
   FINISHED
 }
 
+enum ProcessEventEnum {
+  CREATED
+  TRANSFER_SENT
+  TRANSFER_ACCEPTED
+  TRANSFER_REJECTED
+  FINISHED
+  REOPENED
+  EXTERNAL_SENT
+  EXTERNAL_RECOVERED
+  ADMIN_TAKE_OVER
+  ADMIN_FORCE_TRANSFER
+  DATA_EDITED
+}
+
 model Process {
   id          String        @id @default(cuid())
   number      String        @unique
@@ -109,11 +127,13 @@ model Process {
   ownerId String?
   owner   User?   @relation("ProcessOwner", fields: [ownerId], references: [id], onDelete: Restrict)
 
-  pendingTransferToUserId       String?
-  pendingTransferObservation    String?
-  pendingTransferCreatedAt     DateTime?
+  pendingTransferToUserId    String?
+  pendingTransferObservation String?
+  pendingTransferCreatedAt   DateTime?
 
-  location String?  // null = interno, texto = externo
+  location String? // null = interno, texto = externo
+
+  events ProcessEvent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -121,14 +141,25 @@ model Process {
   @@map("process")
 }
 
-// TODO: Futuro - Histórico de movimentações
-// model Movement {
-//   id        String       @id @default(cuid())
-//   processId String
-//   process   Process      @relation(fields: [processId], references: [id], onDelete: Cascade)
-//   type      MovementType
-//   fromUserId String?
-//   toUserId   String?
-//   observation String?
-//   createdAt  DateTime    @default(now())
-// }
+model ProcessEvent {
+  id        String           @id @default(cuid())
+  processId String
+  process   Process          @relation(fields: [processId], references: [id], onDelete: Restrict)
+  type      ProcessEventEnum
+
+  actorId String
+  actor   User   @relation("ProcessEventActor", fields: [actorId], references: [id], onDelete: Restrict)
+
+  fromUserId String?
+  fromUser   User?   @relation("ProcessEventFrom", fields: [fromUserId], references: [id], onDelete: SetNull)
+
+  toUserId String?
+  toUser   User?   @relation("ProcessEventTo", fields: [toUserId], references: [id], onDelete: SetNull)
+
+  observation String?
+  metadata    Json?
+
+  createdAt DateTime @default(now())
+
+  @@map("process_event")
+}

@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 import {
   type ActionResponse,
@@ -8,7 +7,6 @@ import {
   createSuccessResponse,
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
-import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 
 const sendTransferSchema = z.object({
@@ -20,23 +18,14 @@ const sendTransferSchema = z.object({
 export const sendTransfer = withPermissions(
   [{ resource: "process", action: ["transfer"] }],
   async (
-    _session,
+    session,
     data: z.infer<typeof sendTransferSchema>,
   ): Promise<ActionResponse<void>> => {
     try {
       const { processId, toUserId, observation } =
         sendTransferSchema.parse(data);
 
-      const sessionHeaders = await headers();
-      const fullSession = await auth.api.getSession({
-        headers: sessionHeaders,
-      });
-
-      if (!fullSession) {
-        return createErrorResponse("Sessão não encontrada.");
-      }
-
-      if (fullSession.user.id === toUserId) {
+      if (session.user.id === toUserId) {
         return createErrorResponse(
           "Você não pode enviar um processo para si mesmo.",
         );
@@ -56,7 +45,7 @@ export const sendTransfer = withPermissions(
         );
       }
 
-      if (process.ownerId !== fullSession.user.id) {
+      if (process.ownerId !== session.user.id) {
         return createErrorResponse(
           "Você só pode tramitir processos que estão sob sua posse.",
         );
@@ -80,14 +69,26 @@ export const sendTransfer = withPermissions(
         return createErrorResponse("Não é possível enviar para este usuário.");
       }
 
-      await prisma.process.update({
-        where: { id: processId },
-        data: {
-          pendingTransferToUserId: toUserId,
-          pendingTransferObservation: observation,
-          pendingTransferCreatedAt: new Date(),
-        },
-      });
+      await prisma.$transaction([
+        prisma.process.update({
+          where: { id: processId },
+          data: {
+            pendingTransferToUserId: toUserId,
+            pendingTransferObservation: observation,
+            pendingTransferCreatedAt: new Date(),
+          },
+        }),
+        prisma.processEvent.create({
+          data: {
+            processId,
+            type: "TRANSFER_SENT",
+            actorId: session.user.id,
+            fromUserId: session.user.id,
+            toUserId,
+            observation: observation || null,
+          },
+        }),
+      ]);
 
       return createSuccessResponse();
     } catch (error) {

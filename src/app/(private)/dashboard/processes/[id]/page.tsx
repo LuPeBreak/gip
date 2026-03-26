@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProcessById } from "@/actions/processes/get-process-by-id";
 import { ProcessDetailAdminActions } from "@/components/dashboard/processes/process-detail-admin-actions";
+import { ProcessHistoryTimeline } from "@/components/dashboard/processes/process-history-timeline";
 import { DashboardPageWrapper } from "@/components/layout/dashboard-page-wrapper";
 import { ProcessStatusBadge } from "@/components/processes/process-status-badge";
 import {
@@ -139,25 +140,11 @@ export default async function ProcessDetailsPage({
                 <History className="h-5 w-5 text-muted-foreground" />
                 <CardTitle>Histórico</CardTitle>
               </div>
-              <CardDescription>
-                Registro de movimentações do processo
-              </CardDescription>
+              <CardDescription>Registro de eventos do processo</CardDescription>
             </CardHeader>
             <Separator />
             <CardContent className="pt-6">
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="rounded-full bg-muted p-4">
-                  <History className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <div className="mt-4 space-y-1">
-                  <p className="font-medium text-muted-foreground">
-                    Em desenvolvimento
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    O histórico de tramitações estará disponível em breve.
-                  </p>
-                </div>
-              </div>
+              <ProcessHistoryTimeline processId={process.id} />
             </CardContent>
           </Card>
         </div>

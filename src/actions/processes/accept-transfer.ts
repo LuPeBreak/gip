@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 import {
   type ActionResponse,
@@ -8,7 +7,6 @@ import {
   createSuccessResponse,
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
-import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 
 const acceptTransferSchema = z.object({
@@ -18,20 +16,11 @@ const acceptTransferSchema = z.object({
 export const acceptTransfer = withPermissions(
   [{ resource: "process", action: ["transfer"] }],
   async (
-    _session,
+    session,
     data: z.infer<typeof acceptTransferSchema>,
   ): Promise<ActionResponse<void>> => {
     try {
       const { processId } = acceptTransferSchema.parse(data);
-
-      const sessionHeaders = await headers();
-      const fullSession = await auth.api.getSession({
-        headers: sessionHeaders,
-      });
-
-      if (!fullSession) {
-        return createErrorResponse("Sessão não encontrada.");
-      }
 
       const process = await prisma.process.findUnique({
         where: { id: processId },
@@ -41,21 +30,32 @@ export const acceptTransfer = withPermissions(
         return createErrorResponse("Processo não encontrado.");
       }
 
-      if (process.pendingTransferToUserId !== fullSession.user.id) {
+      if (process.pendingTransferToUserId !== session.user.id) {
         return createErrorResponse(
           "Você não possui transferência pendente para este processo.",
         );
       }
 
-      await prisma.process.update({
-        where: { id: processId },
-        data: {
-          ownerId: fullSession.user.id,
-          pendingTransferToUserId: null,
-          pendingTransferObservation: null,
-          pendingTransferCreatedAt: null,
-        },
-      });
+      await prisma.$transaction([
+        prisma.process.update({
+          where: { id: processId },
+          data: {
+            ownerId: session.user.id,
+            pendingTransferToUserId: null,
+            pendingTransferObservation: null,
+            pendingTransferCreatedAt: null,
+          },
+        }),
+        prisma.processEvent.create({
+          data: {
+            processId,
+            type: "TRANSFER_ACCEPTED",
+            actorId: session.user.id,
+            fromUserId: process.ownerId,
+            toUserId: session.user.id,
+          },
+        }),
+      ]);
 
       return createSuccessResponse();
     } catch (error) {

@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 import {
   type ActionResponse,
@@ -8,7 +7,6 @@ import {
   createSuccessResponse,
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
-import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 
 const recoverFromExternalSchema = z.object({
@@ -18,20 +16,11 @@ const recoverFromExternalSchema = z.object({
 export const recoverFromExternal = withPermissions(
   [{ resource: "process", action: ["transfer"] }],
   async (
-    _session,
+    session,
     data: z.infer<typeof recoverFromExternalSchema>,
   ): Promise<ActionResponse<void>> => {
     try {
       const { processId } = recoverFromExternalSchema.parse(data);
-
-      const sessionHeaders = await headers();
-      const fullSession = await auth.api.getSession({
-        headers: sessionHeaders,
-      });
-
-      if (!fullSession) {
-        return createErrorResponse("Sessão não encontrada.");
-      }
 
       const process = await prisma.process.findUnique({
         where: { id: processId },
@@ -53,13 +42,22 @@ export const recoverFromExternal = withPermissions(
         );
       }
 
-      await prisma.process.update({
-        where: { id: processId },
-        data: {
-          location: null,
-          ownerId: fullSession.user.id,
-        },
-      });
+      await prisma.$transaction([
+        prisma.process.update({
+          where: { id: processId },
+          data: {
+            location: null,
+            ownerId: session.user.id,
+          },
+        }),
+        prisma.processEvent.create({
+          data: {
+            processId,
+            type: "EXTERNAL_RECOVERED",
+            actorId: session.user.id,
+          },
+        }),
+      ]);
 
       return createSuccessResponse();
     } catch (error) {

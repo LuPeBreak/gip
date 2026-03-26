@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 import {
   type ActionResponse,
@@ -18,22 +17,11 @@ const deleteProcessSchema = z.object({
 export const deleteProcess = withPermissions(
   [{ resource: "process", action: ["delete", "delete_own"] }],
   async (
-    _session,
+    session,
     data: z.infer<typeof deleteProcessSchema>,
   ): Promise<ActionResponse<void>> => {
     try {
       const { id } = deleteProcessSchema.parse(data);
-
-      const sessionHeaders = await headers();
-      const fullSession = await auth.api.getSession({
-        headers: sessionHeaders,
-      });
-
-      if (!fullSession) {
-        return createErrorResponse("Sessão não encontrada.");
-      }
-
-      const isAdmin = fullSession.user.role === "admin";
 
       const process = await prisma.process.findUnique({
         where: { id },
@@ -49,11 +37,30 @@ export const deleteProcess = withPermissions(
         );
       }
 
-      const isOwner = process.ownerId === fullSession.user.id;
+      const isOwner = process.ownerId === session.user.id;
 
-      if (!isAdmin && !isOwner) {
+      if (!isOwner) {
+        const canDeleteAny = await auth.api.userHasPermission({
+          body: {
+            userId: session.user.id,
+            permissions: { process: ["delete"] },
+          },
+        });
+
+        if (!canDeleteAny.success) {
+          return createErrorResponse(
+            "Você só pode excluir processos que estão sob sua posse.",
+          );
+        }
+      }
+
+      const eventCount = await prisma.processEvent.count({
+        where: { processId: id },
+      });
+
+      if (eventCount > 0) {
         return createErrorResponse(
-          "Você só pode excluir processos que estão sob sua posse.",
+          "Não é possível excluir um processo que possui histórico de movimentações.",
         );
       }
 

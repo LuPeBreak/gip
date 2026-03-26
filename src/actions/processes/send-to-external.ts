@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 import {
   type ActionResponse,
@@ -8,7 +7,6 @@ import {
   createSuccessResponse,
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
-import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/prisma";
 
 const sendToExternalSchema = z.object({
@@ -19,20 +17,11 @@ const sendToExternalSchema = z.object({
 export const sendToExternal = withPermissions(
   [{ resource: "process", action: ["transfer"] }],
   async (
-    _session,
+    session,
     data: z.infer<typeof sendToExternalSchema>,
   ): Promise<ActionResponse<void>> => {
     try {
       const { processId, location } = sendToExternalSchema.parse(data);
-
-      const sessionHeaders = await headers();
-      const fullSession = await auth.api.getSession({
-        headers: sessionHeaders,
-      });
-
-      if (!fullSession) {
-        return createErrorResponse("Sessão não encontrada.");
-      }
 
       const process = await prisma.process.findUnique({
         where: { id: processId },
@@ -48,7 +37,7 @@ export const sendToExternal = withPermissions(
         );
       }
 
-      if (process.ownerId !== fullSession.user.id) {
+      if (process.ownerId !== session.user.id) {
         return createErrorResponse(
           "Você só pode enviar processos que estão sob sua posse.",
         );
@@ -66,13 +55,23 @@ export const sendToExternal = withPermissions(
         );
       }
 
-      await prisma.process.update({
-        where: { id: processId },
-        data: {
-          location,
-          ownerId: null,
-        },
-      });
+      await prisma.$transaction([
+        prisma.process.update({
+          where: { id: processId },
+          data: {
+            location,
+            ownerId: null,
+          },
+        }),
+        prisma.processEvent.create({
+          data: {
+            processId,
+            type: "EXTERNAL_SENT",
+            actorId: session.user.id,
+            observation: location,
+          },
+        }),
+      ]);
 
       return createSuccessResponse();
     } catch (error) {
