@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, PenLine } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -9,7 +10,6 @@ import {
   getAllSectors,
   type SimpleSector,
 } from "@/actions/sectors/get-all-sectors";
-import { editUser } from "@/actions/users/edit-user";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { authClient } from "@/lib/auth/auth-client";
 import { type EditUserFormValues, editUserSchema } from "./edit-user-schema";
 import type { UserColumn } from "./users-data-table-columns";
 
@@ -47,6 +48,7 @@ export function EditUserDialog({
   open,
   onOpenChange,
 }: EditUserDialogProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [sectors, setSectors] = useState<SimpleSector[]>([]);
 
@@ -64,7 +66,6 @@ export function EditUserDialog({
   const {
     control,
     handleSubmit,
-    setError,
     formState: { errors, isDirty },
   } = useForm<EditUserFormValues>({
     resolver: zodResolver(editUserSchema),
@@ -77,24 +78,25 @@ export function EditUserDialog({
 
   const onSubmit = (data: EditUserFormValues) => {
     startTransition(async () => {
-      const response = await editUser({ ...data, userId: user.id });
+      const { data: result, error } = await authClient.admin.updateUser({
+        userId: user.id,
+        data: {
+          name: data.name,
+          role: data.role,
+          sectorId: data.sectorId,
+        },
+      });
 
-      if (response.success) {
+      if (result) {
         toast.success("Usuário atualizado", {
           description: `Os dados de ${data.name} foram salvos com sucesso.`,
         });
         onOpenChange(false);
+        router.refresh();
       } else {
         toast.error("Falha ao salvar usuário", {
-          description: response.error?.message,
+          description: error?.message || "Erro desconhecido",
         });
-
-        if (response.error?.field) {
-          setError(response.error.field as keyof EditUserFormValues, {
-            type: "server",
-            message: response.error.message,
-          });
-        }
       }
     });
   };

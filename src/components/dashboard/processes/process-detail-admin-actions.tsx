@@ -1,9 +1,11 @@
 "use client";
 
-import { ArrowRightLeft, Shield } from "lucide-react";
+import { ArrowRightLeft, Edit, Shield, Trash } from "lucide-react";
 import { useState } from "react";
-import type { ProcessBase } from "@/actions/processes/process-types";
+import type { ProcessItem } from "@/actions/processes/get-processes";
 import { AdminForceTransferDialog } from "@/components/dashboard/processes/admin-force-transfer-dialog";
+import { DeleteProcessDialog } from "@/components/dashboard/processes/delete-process-dialog";
+import { ProcessDialog } from "@/components/dashboard/processes/process-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,15 +15,34 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { authClient } from "@/lib/auth/auth-client";
+import type { RoleKey } from "@/lib/auth/permissions";
 
 interface ProcessDetailAdminActionsProps {
-  process: ProcessBase;
+  process: ProcessItem;
 }
 
 export function ProcessDetailAdminActions({
   process,
 }: ProcessDetailAdminActionsProps) {
   const [showForceTransfer, setShowForceTransfer] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const { data: session } = authClient.useSession();
+  const userRole = (session?.user.role as RoleKey) ?? "user";
+
+  const canEdit = authClient.admin.checkRolePermission({
+    permissions: { process: ["update"] },
+    role: userRole,
+  });
+
+  const canDelete = authClient.admin.checkRolePermission({
+    permissions: { process: ["delete"] },
+    role: userRole,
+  });
+
+  const isOpen = process.status === "OPEN";
   const isFinished = process.status === "FINISHED";
 
   return (
@@ -35,11 +56,11 @@ export function ProcessDetailAdminActions({
             </CardTitle>
           </div>
           <CardDescription>
-            Ações para destravar ou transferir este processo.
+            Ações exclusivas para administradores sobre este processo.
           </CardDescription>
         </CardHeader>
         <Separator />
-        <CardContent className="pt-4">
+        <CardContent className="pt-4 space-y-2">
           <Button
             variant="outline"
             className="w-full"
@@ -49,6 +70,26 @@ export function ProcessDetailAdminActions({
             <ArrowRightLeft className="mr-2 h-4 w-4" />
             Transferência Forçada
           </Button>
+          {canEdit && (
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setShowEditDialog(true)}
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Editar Processo
+            </Button>
+          )}
+          {canDelete && isOpen && (
+            <Button
+              variant="outline"
+              className="w-full text-destructive hover:text-destructive"
+              onClick={() => setShowDeleteDialog(true)}
+            >
+              <Trash className="mr-2 h-4 w-4" />
+              Excluir Processo
+            </Button>
+          )}
         </CardContent>
       </Card>
 
@@ -57,6 +98,22 @@ export function ProcessDetailAdminActions({
         open={showForceTransfer}
         onOpenChange={setShowForceTransfer}
       />
+
+      {canEdit && (
+        <ProcessDialog
+          process={process}
+          open={showEditDialog}
+          onOpenChange={setShowEditDialog}
+        />
+      )}
+
+      {canDelete && isOpen && (
+        <DeleteProcessDialog
+          process={process}
+          open={showDeleteDialog}
+          onOpenChange={setShowDeleteDialog}
+        />
+      )}
     </>
   );
 }

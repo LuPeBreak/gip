@@ -1,16 +1,8 @@
 "use client";
 
-import {
-  Ban,
-  KeyRound,
-  Loader2,
-  MoreHorizontal,
-  PenLine,
-  Unlock,
-} from "lucide-react";
-import { useState, useTransition } from "react";
-import { toast } from "sonner";
-import { toggleUserBan } from "@/actions/users/toggle-ban";
+import { Ban, KeyRound, MoreHorizontal, PenLine, Unlock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,8 +12,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { BanUserDialog } from "./ban-user-dialog";
 import { EditUserDialog } from "./edit-user-dialog";
 import { ResetPasswordDialog } from "./reset-password-dialog";
+import { UnbanUserDialog } from "./unban-user-dialog";
 import type { UserColumn } from "./users-data-table-columns";
 
 interface UsersDataTableRowActionsProps {
@@ -31,31 +25,21 @@ interface UsersDataTableRowActionsProps {
 export function UsersDataTableRowActions({
   user,
 }: UsersDataTableRowActionsProps) {
-  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showBanDialog, setShowBanDialog] = useState(false);
+  const [showUnbanDialog, setShowUnbanDialog] = useState(false);
 
   const isBanned = !!user.banned;
 
   const handleToggleBan = () => {
-    startTransition(async () => {
-      const result = await toggleUserBan({
-        userId: user.id,
-        banned: !isBanned,
-        // Optional: you can pass reason here later if we add a Ban Dialog
-        banReason: !isBanned ? "Violação dos Termos" : null,
-      });
-
-      if (result.success) {
-        toast.success(isBanned ? "Usuário Desbanido" : "Usuário Banido", {
-          description: `O status de ${user.name} foi atualizado com sucesso.`,
-        });
-      } else {
-        toast.error("Erro ao atualizar status", {
-          description: result.error?.message || "Erro desconhecido",
-        });
-      }
-    });
+    if (isBanned) {
+      setShowUnbanDialog(true);
+    } else {
+      // Ban opens dialog for optional reason
+      setShowBanDialog(true);
+    }
   };
 
   const handleResetPassword = () => {
@@ -73,11 +57,7 @@ export function UsersDataTableRowActions({
           variant="ghost"
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
         >
-          {isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-          ) : (
-            <MoreHorizontal className="h-4 w-4" />
-          )}
+          <MoreHorizontal className="h-4 w-4" />
           <span className="sr-only">Abrir menu</span>
         </Button>
       </DropdownMenuTrigger>
@@ -85,19 +65,18 @@ export function UsersDataTableRowActions({
         <DropdownMenuLabel>Ações</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem onClick={handleEdit} disabled={isPending}>
+        <DropdownMenuItem onClick={handleEdit}>
           <PenLine className="mr-2 h-4 w-4" />
           Editar
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={handleResetPassword} disabled={isPending}>
+        <DropdownMenuItem onClick={handleResetPassword}>
           <KeyRound className="mr-2 h-4 w-4" />
           Redefinir Senha
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={handleToggleBan}
-          disabled={isPending}
           className={
             isBanned ? "text-green-600 dark:text-green-400" : "text-destructive"
           }
@@ -126,6 +105,22 @@ export function UsersDataTableRowActions({
         user={user}
         open={showResetDialog}
         onOpenChange={setShowResetDialog}
+      />
+
+      <BanUserDialog
+        userId={user.id}
+        userName={user.name}
+        open={showBanDialog}
+        onOpenChange={setShowBanDialog}
+        onSuccess={() => router.refresh()}
+      />
+
+      <UnbanUserDialog
+        userId={user.id}
+        userName={user.name}
+        open={showUnbanDialog}
+        onOpenChange={setShowUnbanDialog}
+        onSuccess={() => router.refresh()}
       />
     </DropdownMenu>
   );

@@ -9,10 +9,10 @@ import {
   KeyRound,
   Loader2,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { resetUserPassword } from "@/actions/users/reset-password";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -30,6 +30,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth/auth-client";
 import { generatePasswordFromName } from "@/lib/utils/password";
 import {
   type ResetPasswordFormValues,
@@ -48,6 +49,7 @@ export function ResetPasswordDialog({
   open,
   onOpenChange,
 }: ResetPasswordDialogProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
   const [autoGeneratePassword, setAutoGeneratePassword] = useState(false);
@@ -94,17 +96,21 @@ export function ResetPasswordDialog({
 
   const onSubmit = (data: ResetPasswordFormValues) => {
     startTransition(async () => {
-      const response = await resetUserPassword({
+      const passwordToSet =
+        data.password || Math.random().toString(36).slice(-8);
+
+      const { data: result, error } = await authClient.admin.setUserPassword({
         userId: user.id,
-        password: data.password,
+        newPassword: passwordToSet,
       });
 
-      if (response.success && response.data?.password) {
-        setSuccessfulPassword(response.data.password);
+      if (result) {
+        setSuccessfulPassword(passwordToSet);
         toast.success("Senha atualizada");
+        router.refresh();
       } else {
         toast.error("Erro ao redefinir a senha", {
-          description: response.error?.message,
+          description: error?.message || "Erro desconhecido",
         });
       }
     });

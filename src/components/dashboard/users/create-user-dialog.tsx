@@ -10,7 +10,6 @@ import {
   getAllSectors,
   type SimpleSector,
 } from "@/actions/sectors/get-all-sectors";
-import { createUser } from "@/actions/users/create-user";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -36,6 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { authClient } from "@/lib/auth/auth-client";
 import { generatePasswordFromName } from "@/lib/utils/password";
 import {
   type CreateUserFormValues,
@@ -65,7 +65,6 @@ export function CreateUserDialog() {
     control,
     handleSubmit,
     reset,
-    setError,
     setValue,
     watch,
     formState: { errors },
@@ -114,9 +113,15 @@ export function CreateUserDialog() {
 
   const onSubmit = (data: CreateUserFormValues) => {
     startTransition(async () => {
-      const response = await createUser(data);
+      const { data: newUser, error } = await authClient.admin.createUser({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+        role: data.role,
+        data: { sectorId: data.sectorId },
+      });
 
-      if (response.success) {
+      if (newUser) {
         toast.success("Usuário criado", {
           description: `O usuário ${data.name} foi criado com sucesso.`,
         });
@@ -127,16 +132,8 @@ export function CreateUserDialog() {
         router.refresh();
       } else {
         toast.error("Falha ao criar usuário", {
-          description: response.error?.message,
+          description: error?.message || "Erro desconhecido",
         });
-
-        // Handle specialized field errors if returned from server
-        if (response.error?.field) {
-          setError(response.error.field as keyof CreateUserFormValues, {
-            type: "server",
-            message: response.error.message,
-          });
-        }
       }
     });
   };

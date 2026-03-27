@@ -1,29 +1,41 @@
+import {
+  ArrowRight,
+  Building2,
+  ClipboardList,
+  FileSearch,
+  Search,
+  Users,
+  Workflow,
+} from "lucide-react";
 import Link from "next/link";
-import { Workflow, Users, FileSearch, Search, ArrowRight, Building2, ClipboardList } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   const features = [
     {
       icon: FileSearch,
       title: "Histórico de Movimentações",
-      description: "Acompanhe cada etapa do processo com registro imutável de todas as ações realizadas.",
+      description:
+        "Acompanhe cada etapa do processo com registro imutável de todas as ações realizadas.",
     },
     {
       icon: Users,
       title: "Controle de Posse",
-      description: "Saiba exatamente quem está com cada processo, eliminando a dúvida sobre &ldquo;em qual mesa está o processo&rdquo;.",
+      description:
+        "Saiba exatamente quem está com cada processo, eliminando a dúvida sobre &ldquo;em qual mesa está o processo&rdquo;.",
     },
     {
       icon: Search,
       title: "Busca Global",
-      description: "Pesquise processos por número ou descrição e encontre rapidamente qualquer processo no sistema.",
+      description:
+        "Pesquise processos por número ou descrição e encontre rapidamente qualquer processo no sistema.",
     },
     {
       icon: ClipboardList,
       title: "Gestão de Setores",
-      description: "Adminstre os micro-setores como Pregão, Contratos, Compras e Jurídico.",
+      description:
+        "Adminstre os micro-setores como Pregão, Contratos, Compras e Jurídico.",
     },
   ];
 
@@ -51,13 +63,20 @@ export default function HomePage() {
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight">GIP</h1>
-              <p className="text-xs text-muted-foreground">Gestão Interna de Processos</p>
+              <p className="text-xs text-muted-foreground">
+                Gestão Interna de Processos
+              </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <ThemeSwitcher />
-            <Button variant="outline" size="sm" asChild className="border-blue-200 dark:border-slate-700">
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="border-blue-200 dark:border-slate-700"
+            >
               <Link href="/login">
                 Entrar
                 <ArrowRight className="ml-2 w-4 h-4" />
@@ -83,14 +102,16 @@ export default function HomePage() {
           </h2>
 
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
-            Sistema de gestão interna para otimizar o controle e a rastreabilidade dos processos licitatórios. 
-            Elimine a dúvida sobre &ldquo;em qual mesa está o processo&rdquo; com transparência e eficiência.
+            Sistema de gestão interna para otimizar o controle e a
+            rastreabilidade dos processos licitatórios. Elimine a dúvida sobre
+            &ldquo;em qual mesa está o processo&rdquo; com transparência e
+            eficiência.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button 
-              size="lg" 
-              asChild 
+            <Button
+              size="lg"
+              asChild
               className="bg-gradient-to-r from-blue-700 to-green-600 hover:from-blue-800 hover:to-green-700 border-0 text-white"
             >
               <Link href="/login">
@@ -110,7 +131,8 @@ export default function HomePage() {
               Funcionalidades Principais
             </h3>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Uma plataforma completa para gestionar os processos da Secretaria de Administração
+              Uma plataforma completa para gestionar os processos da Secretaria
+              de Administração
             </p>
           </div>
 

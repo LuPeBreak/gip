@@ -54,19 +54,22 @@ export const deleteProcess = withPermissions(
         }
       }
 
-      const eventCount = await prisma.processEvent.count({
-        where: { processId: id },
+      const realEventCount = await prisma.processEvent.count({
+        where: { processId: id, type: { not: "CREATED" } },
       });
 
-      if (eventCount > 0) {
+      if (realEventCount > 0) {
         return createErrorResponse(
           "Não é possível excluir um processo que possui histórico de movimentações.",
         );
       }
 
-      await prisma.process.delete({
-        where: { id },
-      });
+      await prisma.$transaction([
+        prisma.processEvent.deleteMany({
+          where: { processId: id, type: "CREATED" },
+        }),
+        prisma.process.delete({ where: { id } }),
+      ]);
 
       return createSuccessResponse();
     } catch (error) {
