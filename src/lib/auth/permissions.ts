@@ -19,6 +19,7 @@ const statement = {
     "transfer",
     "intervene",
   ],
+  report: ["export"],
   user: [...defaultStatements.user, "list_minimal"],
 } as const;
 
@@ -39,11 +40,13 @@ export const roles = {
       "transfer",
       "intervene",
     ],
+    report: ["export"],
     user: [...defaultStatements.user, "list_minimal"],
   }),
   user: ac.newRole({
     ...userAc.statements,
     process: ["create", "list", "delete_own", "finish", "reopen", "transfer"],
+    report: ["export"],
     user: ["list_minimal"],
   }),
 } as const;

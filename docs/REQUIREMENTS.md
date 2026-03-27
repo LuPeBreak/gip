@@ -64,7 +64,7 @@ O conceito central do sistema é a **POSSE**. Um processo só pode ser manipulad
     - A posse fica "congelada" - owner não pode transferir ou finalizar enquanto estiver externo.
 - **[RN-009] Recuperação de Externo:**
     - O sistema deve permitir "recuperar" um processo que está em setor externo.
-    - **Quem pode recuperar:** Qualquer usuário com permissão de `transfer`.
+    - **Quem pode recuperar:** Usuários com as devidas permissões.
     - Ao recuperar, o usuário assume a posse do processo e `location` volta a ser null.
 
 ### 2.4. Administração e Gestão de Crise (Admin Override)
@@ -85,9 +85,9 @@ O conceito central do sistema é a **POSSE**. Um processo só pode ser manipulad
 - **[RN-012] Busca Global:**
     - Pesquisa por Número ou Descrição, retornando status atual e quem detém a posse.
 
-### 2.6. Relatórios Gerenciais (Para Admins)
+### 2.6. Relatórios Gerenciais
 - **[RN-013] Exportação de Dados:**
-    - Administradores devem poder gerar relatórios (Excel/.xlsx) contendo:
+    - Usuários com devida permissão podem gerar relatórios (Excel/.xlsx) contendo:
         1.  Número do Processo
         2.  Descrição
         3.  Status Atual

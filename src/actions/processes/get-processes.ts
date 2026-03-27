@@ -7,6 +7,7 @@ import {
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
 import { prisma } from "@/lib/prisma";
+import { buildProcessWhereClause } from "./process-filter-utils";
 import type { ProcessBase } from "./process-types";
 
 export type ProcessItem = ProcessBase;
@@ -31,36 +32,10 @@ export const getAllProcesses = withPermissions(
     try {
       const page = params?.page ?? 1;
       const pageSize = params?.pageSize ?? 15;
-      const search = params?.search ?? "";
-      const status = params?.status ?? "";
-      const location = params?.location ?? "";
       const orderBy = params?.orderBy ?? "createdAt";
       const order = params?.order ?? "desc";
 
-      const where: Record<string, unknown> = {};
-
-      if (search) {
-        where.OR = [
-          { number: { contains: search, mode: "insensitive" } },
-          { description: { contains: search, mode: "insensitive" } },
-        ];
-      }
-
-      if (status && status !== "all") {
-        where.status = status;
-      }
-
-      if (location) {
-        if (location === "internal") {
-          where.location = null;
-        } else if (location === "external") {
-          where.location = { not: null };
-        }
-      }
-
-      if (params?.ownerId) {
-        where.ownerId = params.ownerId;
-      }
+      const where = buildProcessWhereClause(params);
 
       const totalCount = await prisma.process.count({ where });
 

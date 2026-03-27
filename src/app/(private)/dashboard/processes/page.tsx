@@ -1,6 +1,7 @@
 import type { SearchParams } from "nuqs/server";
 import { getAllProcesses } from "@/actions/processes/get-processes";
 import { getAllUserOptions } from "@/actions/users/get-all-user-options";
+import { ExportProcessesButton } from "@/components/dashboard/processes/export-processes-button";
 import { processesColumns } from "@/components/dashboard/processes/processes-data-table-columns";
 import { ProcessesDataTableToolbar } from "@/components/dashboard/processes/processes-data-table-toolbar";
 import { processesSearchParamsCache } from "@/components/dashboard/processes/processes-search-params";
@@ -59,6 +60,7 @@ export default async function ProcessesPage({
         pageCount={pageCount}
         totalCount={totalCount}
         toolbar={<ProcessesDataTableToolbar users={users} />}
+        tableActions={<ExportProcessesButton />}
       />
     </DashboardPageWrapper>
   );
