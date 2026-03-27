@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { admin as adminPlugin } from "better-auth/plugins";
+import { admin as adminPlugin, customSession } from "better-auth/plugins";
 import { prisma } from "../prisma";
 import { ac, roles } from "./permissions";
 
@@ -20,6 +20,26 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    customSession(async ({ user }) => {
+      const userWithSector = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          sector: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+
+      return {
+        user: {
+          ...user,
+          sector: userWithSector?.sector || null,
+        },
+      };
+    }),
     adminPlugin({
       ac,
       roles: {
