@@ -20,6 +20,7 @@ const statement = {
     "intervene",
   ],
   report: ["export"],
+  dashboard: ["view_admin"],
   user: [...defaultStatements.user, "list_minimal"],
 } as const;
 
@@ -41,12 +42,14 @@ export const roles = {
       "intervene",
     ],
     report: ["export"],
+    dashboard: ["view_admin"],
     user: [...defaultStatements.user, "list_minimal"],
   }),
   user: ac.newRole({
     ...userAc.statements,
     process: ["create", "list", "delete_own", "finish", "reopen", "transfer"],
     report: ["export"],
+    dashboard: [],
     user: ["list_minimal"],
   }),
 } as const;
