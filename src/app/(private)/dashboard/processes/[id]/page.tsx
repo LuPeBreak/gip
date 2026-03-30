@@ -111,6 +111,11 @@ export default async function ProcessDetailsPage({
                     ) : (
                       <span className="italic text-muted-foreground">
                         Sem posse
+                        {process.location && (
+                          <span className="not-italic">
+                            {" "}· <span className="text-foreground font-medium">{process.location}</span>
+                          </span>
+                        )}
                       </span>
                     )}
                     <span className="flex items-center gap-1.5">

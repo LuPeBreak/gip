@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import {
   type ActionResponse,
@@ -133,6 +134,10 @@ export const forceTransferProcess = withPermissions(
       } catch (error) {
         console.error("Falha ao enviar email de transferência forçada:", error);
       }
+
+      revalidatePath("/dashboard/processes");
+      revalidatePath("/dashboard/my-processes");
+      revalidatePath("/dashboard");
 
       return createSuccessResponse();
     } catch (error) {

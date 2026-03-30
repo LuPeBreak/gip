@@ -16,14 +16,3 @@ export type ProcessBase = {
   pendingTransferCreatedAt?: Date | null;
   location?: string | null;
 };
-
-export function formatProcessOwner(
-  ownerName: string | null,
-  ownerSectorName: string | null,
-): { name: string; sector: string } | null {
-  if (!ownerName) return null;
-  return {
-    name: ownerName,
-    sector: ownerSectorName ?? "Sem setor",
-  };
-}

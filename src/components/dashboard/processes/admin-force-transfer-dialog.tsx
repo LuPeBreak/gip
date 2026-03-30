@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowRightLeft, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { forceTransferProcess } from "@/actions/processes/force-transfer-process";
@@ -34,7 +33,6 @@ export function AdminForceTransferDialog({
   onOpenChange,
 }: AdminForceTransferDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
   const [users, setUsers] = useState<UserOption[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserOption | null>(null);
   const [reason, setReason] = useState("");
@@ -87,7 +85,6 @@ export function AdminForceTransferDialog({
           description: `O processo ${process.number} foi transferido para ${selectedUser.name}.`,
         });
         handleOpen(false);
-        router.refresh();
       } else {
         toast.error("Erro ao transferir processo", {
           description: response.error?.message,

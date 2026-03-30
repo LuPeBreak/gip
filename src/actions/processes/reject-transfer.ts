@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import {
   type ActionResponse,
@@ -80,6 +81,10 @@ export const rejectTransfer = withPermissions(
       } catch (error) {
         console.error("Falha ao enviar email de rejeição:", error);
       }
+
+      revalidatePath("/dashboard/my-processes");
+      revalidatePath("/dashboard/inbox");
+      revalidatePath("/dashboard");
 
       return createSuccessResponse();
     } catch (error) {

@@ -32,6 +32,11 @@ export const getUsers = withPermissions(
       const orderBy = params?.orderBy ?? "name";
       const order = params?.order ?? "asc";
 
+      const validOrderByFields = ["name", "email", "role", "createdAt"];
+      const safeOrderBy = validOrderByFields.includes(orderBy)
+        ? orderBy
+        : "name";
+
       // Dynamically extract the "where" type that Prisma expects for User queries.
       type UserWhereInput = NonNullable<
         Parameters<typeof prisma.user.count>[0]
@@ -69,7 +74,7 @@ export const getUsers = withPermissions(
             },
           },
           orderBy: {
-            [orderBy]: order,
+            [safeOrderBy]: order,
           },
           skip: (page - 1) * pageSize,
           take: pageSize,

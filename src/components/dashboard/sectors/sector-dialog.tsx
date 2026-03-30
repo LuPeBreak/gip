@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, PenLine } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -40,7 +39,6 @@ export function SectorDialog({
   onOpenChange,
 }: SectorDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
   const isEdit = !!sector;
 
   const {
@@ -89,7 +87,6 @@ export function SectorDialog({
             : `O setor "${data.name}" foi criado com sucesso.`,
         });
         onOpenChange(false);
-        router.refresh();
       } else {
         toast.error(isEdit ? "Falha ao salvar setor" : "Falha ao criar setor", {
           description: response.error?.message,

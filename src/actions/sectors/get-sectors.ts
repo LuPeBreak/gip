@@ -30,6 +30,11 @@ export const getSectors = withPermissions(
       const orderBy = params?.orderBy ?? "name";
       const order = params?.order ?? "asc";
 
+      const validOrderByFields = ["name", "description", "createdAt"];
+      const safeOrderBy = validOrderByFields.includes(orderBy)
+        ? orderBy
+        : "name";
+
       type SectorWhereInput = NonNullable<
         Parameters<typeof prisma.sector.count>[0]
       >["where"];
@@ -56,7 +61,7 @@ export const getSectors = withPermissions(
             },
           },
           orderBy: {
-            [orderBy]: order,
+            [safeOrderBy]: order,
           },
           skip: (page - 1) * pageSize,
           take: pageSize,

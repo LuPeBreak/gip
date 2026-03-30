@@ -1,7 +1,6 @@
 "use client";
 
 import { Loader2, XCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { cancelTransfer } from "@/actions/processes/cancel-transfer";
@@ -28,7 +27,6 @@ export function CancelTransferDialog({
   onOpenChange,
 }: CancelTransferDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   const handleCancel = () => {
     startTransition(async () => {
@@ -39,7 +37,6 @@ export function CancelTransferDialog({
           description: `O processo ${process.number} voltou para sua posse.`,
         });
         onOpenChange(false);
-        router.refresh();
       } else {
         toast.error("Erro ao cancelar transferência", {
           description: response.error?.message,

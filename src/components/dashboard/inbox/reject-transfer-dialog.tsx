@@ -1,7 +1,6 @@
 "use client";
 
 import { Loader2, XCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import type { InboxTransferItem } from "@/actions/processes/get-inbox-transfers";
@@ -29,7 +28,6 @@ export function RejectTransferDialog({
   onOpenChange,
 }: RejectTransferDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
   const [reason, setReason] = useState("");
 
   const handleReject = () => {
@@ -45,7 +43,6 @@ export function RejectTransferDialog({
         });
         setReason("");
         onOpenChange(false);
-        router.refresh();
       } else {
         toast.error("Erro ao rejeitar transferência", {
           description: response.error?.message,

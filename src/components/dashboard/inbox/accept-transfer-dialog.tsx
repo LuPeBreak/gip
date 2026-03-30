@@ -1,7 +1,6 @@
 "use client";
 
 import { CheckCircle2, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { acceptTransfer } from "@/actions/processes/accept-transfer";
@@ -28,7 +27,6 @@ export function AcceptTransferDialog({
   onOpenChange,
 }: AcceptTransferDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   const handleAccept = () => {
     startTransition(async () => {
@@ -39,7 +37,6 @@ export function AcceptTransferDialog({
           description: `Você agora é o responsável pelo processo ${transfer.processNumber}.`,
         });
         onOpenChange(false);
-        router.refresh();
       } else {
         toast.error("Erro ao aceitar transferência", {
           description: response.error?.message,

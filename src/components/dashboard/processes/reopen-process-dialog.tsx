@@ -1,7 +1,6 @@
 "use client";
 
 import { Loader2, RotateCcw } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import type { ProcessItem } from "@/actions/processes/get-processes";
@@ -28,7 +27,6 @@ export function ReopenProcessDialog({
   onOpenChange,
 }: ReopenProcessDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   const handleReopen = () => {
     startTransition(async () => {
@@ -39,7 +37,6 @@ export function ReopenProcessDialog({
           description: `O processo ${process.number} foi reaberto e está sob sua posse.`,
         });
         onOpenChange(false);
-        router.refresh();
       } else {
         toast.error("Ação bloqueada", {
           description: response.error?.message,

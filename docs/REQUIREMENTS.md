@@ -34,7 +34,7 @@ O conceito central do sistema é a **POSSE**. Um processo só pode ser manipulad
     - **Se já houve movimentação:** O processo torna-se **IMUTÁVEL**. Não pode ser editado nem excluído.
 
 - **[RN-019] Edição de Processos (Correção Administrativa):**
-    - **Quem pode editar:** Apenas **ADMINISTRADORES**.
+    - **Quem pode editar:** Usuários com devida permissão (atualmente apenas admins).
     - **Quando:** A qualquer momento, independente de onde o processo esteja (mesa de outro usuário, externo, etc).
     - **O que pode ser editado:** Número e Descrição.
     - **Objetivo:** Corrigir erros de cadastro que foram percebidos tardiamente, evitando a necessidade de excluir e perder histórico.
@@ -59,20 +59,22 @@ O conceito central do sistema é a **POSSE**. Um processo só pode ser manipulad
 
 ### 2.3. Tramitação Externa
 - **[RN-008] Envio para Externo:**
-    - O usuário em posse de um processo pode envi-lo para um setor externo (ex: Jurídico).
-    - O processo continua com status OPEN ou FINISHED, mas um campo `location` indica onde está.
-    - A posse fica "congelada" - owner não pode transferir ou finalizar enquanto estiver externo.
+    - O usuário em posse de um processo pode enviá-lo para um setor externo (ex: Jurídico).
+    - O processo mantém seu status atual, mas um campo `location` indica onde está fisicamente.
+    - Ao enviar para externo, o processo **perde a posse** (ownerId = null), ficando órfão. Isso permite que **qualquer usuário** com permissão possa recuperar o processo (ver [RN-009]), evitando que fique preso a um único responsável caso este esteja ausente.
+    - A rastreabilidade é mantida pelo histórico de eventos (EXTERNAL_SENT registra quem enviou e para onde).
 - **[RN-009] Recuperação de Externo:**
     - O sistema deve permitir "recuperar" um processo que está em setor externo.
-    - **Quem pode recuperar:** Usuários com as devidas permissões.
+    - **Quem pode recuperar:** Usuários com devidas permissões.
     - Ao recuperar, o usuário assume a posse do processo e `location` volta a ser null.
+    - Objetivo: Permitir que qualquer um com permissão "pegue de volta" o processo que foi enviado para externo - o processo está em outro setor onde não há mais controle direto.
 
 ### 2.4. Administração e Gestão de Crise (Admin Override)
 - **[RN-017] Intervenção Administrativa:**
-    - Administradores possuem "Super Poderes" para destravar processos parados (ex: funcionário doente/férias).
+    - Usuários com devidas permissões possuem "Super Poderes" para destravar processos parados (ex: funcionário doente/férias). Atualmente, apenas administradores possuem essas permissões, mas a arquitetura permite ampliar para outros papéis no futuro.
     - **Ações:**
-        1.  **Tomada de Posse (Take Over):** Admin puxa qualquer processo para sua própria mesa.
-        2.  **Transferência Forçada (Force Transfer):** Admin move processo da mesa de User A diretamente para User B.
+        1.  **Tomada de Posse (Take Over):** Puxa qualquer processo para sua própria mesa.
+        2.  **Transferência Forçada (Force Transfer):** Move processo da mesa de User A diretamente para User B.
     - **Regra de Ouro:** Estas ações **NÃO** requerem aceite do destinatário. A troca de posse é imediata.
     - **Auditoria:** Obrigatório gerar histórico automático ("Movimentação Administrativa: [Motivo]").
 
@@ -102,7 +104,7 @@ O conceito central do sistema é a **POSSE**. Um processo só pode ser manipulad
         2.  **Admin (Gestor):** Acesso total. Pode gerenciar usuários, setores e realizar intervenções em qualquer processo (ver [RN-017]).
     - **Reset de Senha:** Admins podem redefinir a senha de qualquer usuário.
 - **[RN-015] Gestão de Micro-Setores:**
-    - Admins podem criar, editar e desativar Micro-Setores (ex: Pregão, Contratos).
+    - Admins podem criar, editar e excluir Micro-Setores (ex: Pregão, Contratos).
     - Validação: Não permitir apagar setor com usuários vinculados.
 
 ### 2.8. Autogestão e Autenticação
@@ -112,7 +114,7 @@ O conceito central do sistema é a **POSSE**. Um processo só pode ser manipulad
     - **Login:** Acesso via Email e Senha.
     - **Logout:** O usuário deve ter a opção clara de sair o sistema, invalidando a sessão atual.
 
-- **[RN-021] Notificações e Limbo (Futuro / V2):**
+- **[RN-021] Notificações e Limbo:**
     - O sistema enviará um **Email de Notificação** para o usuário destinatário sempre que um processo for enviado para sua caixa de entrada (`PENDENTE`).
     - A interface alertará visualmente quando houver processos "Pardos/Pendentes" há muito tempo, combatendo o "Limbo" (onde o sistema diz que está com A, mas o papel já foi deixado na mesa de B).
 
@@ -138,6 +140,6 @@ O conceito central do sistema é a **POSSE**. Um processo só pode ser manipulad
 
 - **Micro-Setor:** Subdivisão interna da Licitação (Etapa).
 - **Profile (Usuário):** Servidor com acesso ao sistema, vinculado a um micro-setor.
-- **Processo:** Entidade principal (`status`: `open`, `finished`, `location`: local atual do processo).
-- **Movimentação (Tramite):** Registro da transferência de posse (`pending`, `accepted`, `rejected`, `system_audit`).
-- **Delete Constraint:** `ON DELETE RESTRICT` (Processos com movimentação não podem ser excluídos).
+- **Processo:** Entidade principal (`status`: `OPEN`, `FINISHED`; `location`: local atual do processo quando externo).
+- **Evento de Processo (Auditoria):** Registro imutável de cada ação: `CREATED`, `FINISHED`, `REOPENED`, `TRANSFER_SENT`, `TRANSFER_ACCEPTED`, `TRANSFER_REJECTED`, `EXTERNAL_SENT`, `EXTERNAL_RECOVERED`, `DATA_EDITED`, `ADMIN_TAKE_OVER`, `ADMIN_FORCE_TRANSFER`.
+- **Delete Constraint:** `ON DELETE RESTRICT` (Processos com histórico de movimentação não podem ser excluídos).

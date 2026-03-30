@@ -1,7 +1,6 @@
 "use client";
 
 import { CheckCircle2, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { finishProcess } from "@/actions/processes/finish-process";
@@ -28,7 +27,6 @@ export function FinishProcessDialog({
   onOpenChange,
 }: FinishProcessDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   const handleFinish = () => {
     startTransition(async () => {
@@ -39,7 +37,6 @@ export function FinishProcessDialog({
           description: `O processo ${process.number} foi finalizado com sucesso.`,
         });
         onOpenChange(false);
-        router.refresh();
       } else {
         toast.error("Ação bloqueada", {
           description: response.error?.message,

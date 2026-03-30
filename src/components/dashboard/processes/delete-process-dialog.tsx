@@ -1,7 +1,6 @@
 "use client";
 
 import { AlertTriangle, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { deleteProcess } from "@/actions/processes/delete-process";
@@ -28,7 +27,6 @@ export function DeleteProcessDialog({
   onOpenChange,
 }: DeleteProcessDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   const handleDelete = () => {
     startTransition(async () => {
@@ -39,7 +37,6 @@ export function DeleteProcessDialog({
           description: `O processo ${process.number} foi excluído com sucesso.`,
         });
         onOpenChange(false);
-        router.refresh();
       } else {
         toast.error("Ação bloqueada", {
           description: response.error?.message,

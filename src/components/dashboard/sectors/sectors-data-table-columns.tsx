@@ -31,6 +31,7 @@ export const sectorsColumns: ColumnDef<SectorColumn>[] = [
   },
   {
     accessorKey: "usersCount",
+    enableSorting: false,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Funcionários" />
     ),

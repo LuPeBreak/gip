@@ -46,6 +46,7 @@ export const usersColumns: ColumnDef<UserColumn>[] = [
   },
   {
     accessorKey: "sectorName",
+    enableSorting: false,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Setor" />
     ),

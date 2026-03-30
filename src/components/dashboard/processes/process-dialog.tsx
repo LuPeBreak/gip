@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, PenLine } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -40,7 +39,6 @@ export function ProcessDialog({
   onOpenChange,
 }: ProcessDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
   const isEdit = !!process;
 
   const {
@@ -87,7 +85,6 @@ export function ProcessDialog({
             : `O processo foi criado com sucesso.`,
         });
         onOpenChange(false);
-        router.refresh();
       } else {
         toast.error(isEdit ? "Falha ao salvar" : "Falha ao criar processo", {
           description: response.error?.message,

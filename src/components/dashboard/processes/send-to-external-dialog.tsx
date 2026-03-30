@@ -1,7 +1,6 @@
 "use client";
 
 import { Loader2, MapPin } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import type { MyProcessItem } from "@/actions/processes/get-my-processes";
@@ -29,7 +28,6 @@ export function SendToExternalDialog({
   onOpenChange,
 }: SendToExternalDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
   const [location, setLocation] = useState("");
 
   const handleSend = () => {
@@ -50,7 +48,6 @@ export function SendToExternalDialog({
         });
         setLocation("");
         onOpenChange(false);
-        router.refresh();
       } else {
         toast.error("Erro ao enviar para externo", {
           description: response.error?.message,

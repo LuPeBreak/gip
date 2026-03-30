@@ -1,7 +1,6 @@
 "use client";
 
 import { AlertTriangle, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
@@ -29,7 +28,6 @@ export function DeleteSectorDialog({
   onOpenChange,
 }: DeleteSectorDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   const handleDelete = () => {
     startTransition(async () => {
@@ -40,7 +38,6 @@ export function DeleteSectorDialog({
           description: `O setor "${sector.name}" foi excluído com sucesso.`,
         });
         onOpenChange(false);
-        router.refresh();
       } else {
         toast.error("Ação Bloqueada", {
           description: response.error?.message,

@@ -45,6 +45,7 @@ export const getProcessById = withPermissions(
         ownerSectorName: process.owner?.sector?.name ?? null,
         createdAt: process.createdAt,
         updatedAt: process.updatedAt,
+        location: process.location,
       });
     } catch (error) {
       console.error("Erro ao buscar processo por ID:", error);

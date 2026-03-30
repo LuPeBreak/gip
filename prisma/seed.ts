@@ -3,8 +3,8 @@ import { auth } from "../src/lib/auth/auth";
 import { prisma } from "../src/lib/prisma";
 
 async function main() {
-  const adminEmail = "lfbmrj15@gmail.com";
-  const adminPassword = "12345678";
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@gip.local";
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "admin1234";
 
   try {
     const existingUser = await prisma.user.findUnique({

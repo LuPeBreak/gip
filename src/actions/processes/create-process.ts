@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import {
   type CreateProcessData,
   createProcessSchema,
@@ -30,7 +31,7 @@ export const createProcess = withPermissions(
         );
       }
 
-      const _createdProcess = await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx) => {
         const process = await tx.process.create({
           data: {
             number: parsedData.number,
@@ -50,6 +51,10 @@ export const createProcess = withPermissions(
 
         return process;
       });
+
+      revalidatePath("/dashboard/my-processes");
+      revalidatePath("/dashboard/processes");
+      revalidatePath("/dashboard");
 
       return createSuccessResponse();
     } catch (error) {

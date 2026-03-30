@@ -13,7 +13,7 @@ import {
   type ProcessFilterParams,
 } from "./process-filter-utils";
 
-export interface ExportProcessesParams extends ProcessFilterParams {}
+export type ExportProcessesParams = ProcessFilterParams;
 
 export interface ExportResult {
   base64: string;

@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import {
   type UpdateProcessData,
   updateProcessSchema,
@@ -82,6 +83,9 @@ export const updateProcess = withPermissions(
           },
         });
       }
+
+      revalidatePath("/dashboard/processes");
+      revalidatePath("/dashboard");
 
       return createSuccessResponse();
     } catch (error) {

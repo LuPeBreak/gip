@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import {
   type ActionResponse,
@@ -60,6 +61,9 @@ export const cancelTransfer = withPermissions(
           },
         }),
       ]);
+
+      revalidatePath("/dashboard/my-processes");
+      revalidatePath("/dashboard");
 
       return createSuccessResponse();
     } catch (error) {

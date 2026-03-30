@@ -1,7 +1,6 @@
 "use client";
 
 import { Loader2, MapPinOff } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import type { MyProcessItem } from "@/actions/processes/get-my-processes";
@@ -28,7 +27,6 @@ export function RecoverFromExternalDialog({
   onOpenChange,
 }: RecoverFromExternalDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   const handleRecover = () => {
     startTransition(async () => {
@@ -41,7 +39,6 @@ export function RecoverFromExternalDialog({
           description: `O processo ${process.number} voltou a ser interno.`,
         });
         onOpenChange(false);
-        router.refresh();
       } else {
         toast.error("Erro ao recuperar", {
           description: response.error?.message,

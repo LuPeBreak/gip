@@ -1,7 +1,6 @@
 "use client";
 
 import { Loader2, Send } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import type { MyProcessItem } from "@/actions/processes/get-my-processes";
@@ -34,7 +33,6 @@ export function SendTransferDialog({
   onOpenChange,
 }: SendTransferDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
   const [users, setUsers] = useState<UserOption[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserOption | null>(null);
   const [observation, setObservation] = useState("");
@@ -90,7 +88,6 @@ export function SendTransferDialog({
           description: `O processo ${process.number} foi enviado para ${selectedUser.name}.`,
         });
         handleOpen(false);
-        router.refresh();
       } else {
         toast.error("Erro ao enviar transferência", {
           description: response.error?.message,
