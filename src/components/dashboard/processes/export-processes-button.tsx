@@ -10,6 +10,7 @@ import {
   locationFilterParser,
   ownerIdParser,
   searchParser,
+  sectorIdParser,
   statusParser,
 } from "./processes-search-params";
 
@@ -20,6 +21,7 @@ export function ExportProcessesButton() {
   const [status] = useQueryState("status", statusParser);
   const [ownerId] = useQueryState("ownerId", ownerIdParser);
   const [location] = useQueryState("location", locationFilterParser);
+  const [sectorId] = useQueryState("sectorId", sectorIdParser);
 
   const handleExport = () => {
     startTransition(async () => {
@@ -28,6 +30,7 @@ export function ExportProcessesButton() {
         status: status || undefined,
         location: location || undefined,
         ownerId: ownerId || undefined,
+        sectorId: sectorId || undefined,
       });
 
       if (!response.success || !response.data) {

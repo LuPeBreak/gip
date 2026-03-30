@@ -1,5 +1,6 @@
 import type { SearchParams } from "nuqs/server";
 import { getAllProcesses } from "@/actions/processes/get-processes";
+import { getAllSectors } from "@/actions/sectors/get-all-sectors";
 import { getAllUserOptions } from "@/actions/users/get-all-user-options";
 import { ExportProcessesButton } from "@/components/dashboard/processes/export-processes-button";
 import { processesColumns } from "@/components/dashboard/processes/processes-data-table-columns";
@@ -16,22 +17,35 @@ export default async function ProcessesPage({
   searchParams,
 }: ProcessesPageProps) {
   const sp = await searchParams;
-  const { page, pageSize, search, status, location, ownerId, orderBy, order } =
-    processesSearchParamsCache.parse(sp);
+  const {
+    page,
+    pageSize,
+    search,
+    status,
+    location,
+    ownerId,
+    sectorId,
+    orderBy,
+    order,
+  } = processesSearchParamsCache.parse(sp);
 
-  const [processesResponse, usersResponse] = await Promise.all([
-    getAllProcesses({
-      page,
-      pageSize,
-      search,
-      status,
-      location,
-      ownerId: ownerId || undefined,
-      orderBy,
-      order: order as "asc" | "desc",
-    }),
-    getAllUserOptions(),
-  ]);
+  const [processesResponse, usersResponse, sectorsResponse] = await Promise.all(
+    [
+      getAllProcesses({
+        page,
+        pageSize,
+        search,
+        status,
+        location,
+        ownerId: ownerId || undefined,
+        sectorId: sectorId || undefined,
+        orderBy,
+        order: order as "asc" | "desc",
+      }),
+      getAllUserOptions(),
+      getAllSectors(),
+    ],
+  );
 
   const processes =
     processesResponse.success && processesResponse.data?.data
@@ -48,6 +62,8 @@ export default async function ProcessesPage({
 
   const users =
     usersResponse.success && usersResponse.data ? usersResponse.data : [];
+  const sectors =
+    sectorsResponse.success && sectorsResponse.data ? sectorsResponse.data : [];
 
   return (
     <DashboardPageWrapper
@@ -59,7 +75,7 @@ export default async function ProcessesPage({
         data={processes}
         pageCount={pageCount}
         totalCount={totalCount}
-        toolbar={<ProcessesDataTableToolbar users={users} />}
+        toolbar={<ProcessesDataTableToolbar users={users} sectors={sectors} />}
         tableActions={<ExportProcessesButton />}
       />
     </DashboardPageWrapper>

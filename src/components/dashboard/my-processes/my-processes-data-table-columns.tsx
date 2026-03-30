@@ -1,9 +1,11 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
+
 import type { MyProcessItem } from "@/actions/processes/get-my-processes";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { ProcessStatusBadge } from "@/components/processes/process-status-badge";
+import { Badge } from "@/components/ui/badge";
 import { MyProcessesDataTableRowActions } from "./my-processes-data-table-row-actions";
 
 export const myProcessesColumns: ColumnDef<MyProcessItem>[] = [
@@ -23,7 +25,7 @@ export const myProcessesColumns: ColumnDef<MyProcessItem>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Descrição" />
     ),
-    size: 400,
+    size: 350,
     cell: ({ row }) => {
       const description = row.original.description;
       return (
@@ -40,6 +42,26 @@ export const myProcessesColumns: ColumnDef<MyProcessItem>[] = [
     ),
     size: 80,
     cell: ({ row }) => <ProcessStatusBadge status={row.original.status} />,
+  },
+  {
+    id: "emTramite",
+    header: "Em Trâmite",
+    size: 180,
+    filterFn: (row) => {
+      const pendingToUserId = row.original.pendingTransferToUserId;
+      return pendingToUserId !== null && pendingToUserId !== undefined;
+    },
+    cell: ({ row }) => {
+      const pendingToUserId = row.original.pendingTransferToUserId;
+      const pendingToUserName = row.original.pendingTransferToUserName;
+      if (!pendingToUserId) return null;
+
+      return (
+        <Badge variant="outline" className="gap-1">
+          Para: {pendingToUserName ?? "Desconhecido"}
+        </Badge>
+      );
+    },
   },
   {
     id: "actions",

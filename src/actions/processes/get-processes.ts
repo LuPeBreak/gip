@@ -19,6 +19,7 @@ export interface GetAllProcessesParams {
   status?: string;
   location?: string;
   ownerId?: string;
+  sectorId?: string;
   orderBy?: string;
   order?: "asc" | "desc";
 }

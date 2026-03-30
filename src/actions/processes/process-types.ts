@@ -11,6 +11,7 @@ export type ProcessBase = {
   createdAt: Date;
   updatedAt?: Date;
   pendingTransferToUserId?: string | null;
+  pendingTransferToUserName?: string | null;
   pendingTransferObservation?: string | null;
   pendingTransferCreatedAt?: Date | null;
   location?: string | null;

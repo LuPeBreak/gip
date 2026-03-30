@@ -26,7 +26,8 @@ model User {
   sectorId String?
   sector   Sector? @relation(fields: [sectorId], references: [id], onDelete: Restrict)
 
-  ownedProcesses Process[] @relation("ProcessOwner")
+  ownedProcesses       Process[] @relation("ProcessOwner")
+  pendingTransferTo   Process[] @relation("ProcessPendingTransferTo")
 
   actedEvents ProcessEvent[] @relation("ProcessEventActor")
   fromEvents  ProcessEvent[] @relation("ProcessEventFrom")
@@ -128,6 +129,7 @@ model Process {
   owner   User?   @relation("ProcessOwner", fields: [ownerId], references: [id], onDelete: Restrict)
 
   pendingTransferToUserId    String?
+  pendingTransferToUser      User?   @relation("ProcessPendingTransferTo", fields: [pendingTransferToUserId], references: [id], onDelete: SetNull)
   pendingTransferObservation String?
   pendingTransferCreatedAt   DateTime?
 

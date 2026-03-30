@@ -5,7 +5,7 @@ import { useQueryState } from "nuqs";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { searchParser } from "./my-processes-search-params";
+import { inTransferParser, searchParser } from "./my-processes-search-params";
 
 export function MyProcessesDataTableToolbar() {
   const [isPending, startTransition] = useTransition();
@@ -15,7 +15,12 @@ export function MyProcessesDataTableToolbar() {
     searchParser.withOptions({ shallow: false, startTransition }),
   );
 
-  const isFiltered = search !== "";
+  const [showInTransfer, setShowInTransfer] = useQueryState(
+    "inTransfer",
+    inTransferParser.withOptions({ shallow: false, startTransition }),
+  );
+
+  const isFiltered = search !== "" || showInTransfer;
 
   return (
     <div className="flex items-center justify-between">
@@ -34,11 +39,20 @@ export function MyProcessesDataTableToolbar() {
           data-pending={isPending ? "" : undefined}
         />
 
+        <Button
+          variant={showInTransfer ? "secondary" : "outline"}
+          size="sm"
+          onClick={() => setShowInTransfer(!showInTransfer)}
+        >
+          Em Trâmite
+        </Button>
+
         {isFiltered && (
           <Button
             variant="ghost"
             onClick={() => {
               setSearch("");
+              setShowInTransfer(false);
             }}
             className="h-8 px-2 lg:px-3"
           >

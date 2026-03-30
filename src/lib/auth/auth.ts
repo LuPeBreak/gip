@@ -11,16 +11,15 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  user: {
-    additionalFields: {
-      sectorId: {
-        type: "string",
-        required: false,
-      },
-    },
-  },
   plugins: [
-    customSession(async ({ user }) => {
+    adminPlugin({
+      ac,
+      roles: {
+        admin: roles.admin,
+        user: roles.user,
+      },
+    }),
+    customSession(async ({ user, session }) => {
       const userWithSector = await prisma.user.findUnique({
         where: { id: user.id },
         select: {
@@ -36,16 +35,11 @@ export const auth = betterAuth({
       return {
         user: {
           ...user,
+          role: (user as unknown as { role: string }).role,
           sector: userWithSector?.sector || null,
         },
+        session,
       };
-    }),
-    adminPlugin({
-      ac,
-      roles: {
-        admin: roles.admin,
-        user: roles.user,
-      },
     }),
   ],
 });

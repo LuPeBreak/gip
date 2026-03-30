@@ -1,25 +1,52 @@
-import { DashboardPageWrapper } from "../../../components/layout/dashboard-page-wrapper";
+import { getDashboardAdminStats } from "@/actions/dashboard/get-dashboard-admin-stats";
+import { getMyDashboardStats } from "@/actions/dashboard/get-my-dashboard-stats";
+import { AdminCharts } from "@/components/dashboard/overview/admin-charts";
+import { OverviewStatCards } from "@/components/dashboard/overview/overview-stat-cards";
+import { DashboardPageWrapper } from "@/components/layout/dashboard-page-wrapper";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const userStatsResponse = await getMyDashboardStats();
+
+  if (!userStatsResponse.success) {
+    return (
+      <DashboardPageWrapper
+        title="Dashboard"
+        description="Visão geral e atalhos rápidos do sistema GIP."
+      >
+        <div className="text-destructive">
+          Erro ao carregar estatísticas:{" "}
+          {userStatsResponse.error?.message ?? "Erro desconhecido"}
+        </div>
+      </DashboardPageWrapper>
+    );
+  }
+
+  const userStats = userStatsResponse.data ?? {
+    myProcesses: 0,
+    pendingTransfers: 0,
+    inbox: 0,
+  };
+
+  const dashboardResponse = await getDashboardAdminStats();
+  const showAdminCharts =
+    dashboardResponse.success &&
+    dashboardResponse.data &&
+    (dashboardResponse.data.processesBySector.length > 0 ||
+      dashboardResponse.data.limboTransfers.length > 0);
+
   return (
     <DashboardPageWrapper
       title="Dashboard"
       description="Visão geral e atalhos rápidos do sistema GIP."
     >
-      <div className="flex flex-col items-start justify-start text-left bg-muted/50 p-6 rounded-lg border border-border">
-        <p className="max-w-xl text-muted-foreground">
-          Nesta tela, no futuro, você verá um resumo rápido do seu dia:
-          <br />
-          <br />- Quantos processos estão em sua posse atualmente.
-          <br />- Quantos você tramitou e aguarda que o recebedor aceite.
-          <br />- Quantos processos estão aguardando você aceitar ou recusar
-          (sua caixa de entrada).
-          <br />
-          <br />
-          (Futuramente, usuários Admin terão aqui gráficos mais detalhados do
-          sistema geral).
-        </p>
-      </div>
+      <OverviewStatCards stats={userStats} />
+      {showAdminCharts && dashboardResponse.data && (
+        <AdminCharts
+          processesBySector={dashboardResponse.data.processesBySector}
+          limboTransfers={dashboardResponse.data.limboTransfers}
+          sectorIdMap={dashboardResponse.data.sectorIdMap}
+        />
+      )}
     </DashboardPageWrapper>
   );
 }

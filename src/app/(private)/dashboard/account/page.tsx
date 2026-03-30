@@ -1,6 +1,8 @@
-import { headers } from "next/headers";
 import { Building2, Mail } from "lucide-react";
-import { auth } from "@/lib/auth/auth";
+import { headers } from "next/headers";
+import { ChangePasswordForm } from "@/components/dashboard/account/change-password-form";
+import { UpdateNameForm } from "@/components/dashboard/account/update-name-form";
+import { DashboardPageWrapper } from "@/components/layout/dashboard-page-wrapper";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Card,
@@ -9,9 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { DashboardPageWrapper } from "@/components/layout/dashboard-page-wrapper";
-import { ChangePasswordForm } from "@/components/dashboard/account/change-password-form";
-import { UpdateNameForm } from "@/components/dashboard/account/update-name-form";
+import { auth } from "@/lib/auth/auth";
 import { getAvatarFallbackByName } from "@/lib/utils/formatters";
 
 export default async function AccountPage() {
