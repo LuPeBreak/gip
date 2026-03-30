@@ -15,7 +15,7 @@ export default async function MyProcessesPage({
   searchParams,
 }: MyProcessesPageProps) {
   const sp = await searchParams;
-  const { page, pageSize, search, orderBy, order } =
+  const { page, pageSize, search, orderBy, order, inTransfer } =
     processesSearchParamsCache.parse(sp);
 
   const response = await getMyProcesses({
@@ -24,6 +24,7 @@ export default async function MyProcessesPage({
     search,
     orderBy,
     order: order as "asc" | "desc",
+    inTransfer,
   });
 
   const processes =

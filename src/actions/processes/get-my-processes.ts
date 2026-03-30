@@ -18,6 +18,7 @@ export interface GetMyProcessesParams {
   search?: string;
   orderBy?: string;
   order?: "asc" | "desc";
+  inTransfer?: boolean;
 }
 
 export const getMyProcesses = withPermissions(
@@ -32,6 +33,7 @@ export const getMyProcesses = withPermissions(
       const search = params?.search ?? "";
       const orderBy = params?.orderBy ?? "createdAt";
       const order = params?.order ?? "desc";
+      const inTransfer = params?.inTransfer ?? false;
 
       const where: Record<string, unknown> = {
         ownerId: session.user.id,
@@ -42,6 +44,10 @@ export const getMyProcesses = withPermissions(
           { number: { contains: search, mode: "insensitive" } },
           { description: { contains: search, mode: "insensitive" } },
         ];
+      }
+
+      if (inTransfer) {
+        where.pendingTransferToUserId = { not: null };
       }
 
       const totalCount = await prisma.process.count({ where });
@@ -68,6 +74,9 @@ export const getMyProcesses = withPermissions(
               },
             },
           },
+          pendingTransferToUser: {
+            select: { name: true },
+          },
         },
         orderBy: {
           [safeOrderBy]: order,
@@ -88,6 +97,7 @@ export const getMyProcesses = withPermissions(
         ownerSectorName: proc.owner?.sector?.name ?? null,
         createdAt: proc.createdAt,
         pendingTransferToUserId: proc.pendingTransferToUserId,
+        pendingTransferToUserName: proc.pendingTransferToUser?.name ?? null,
         pendingTransferObservation: proc.pendingTransferObservation,
         pendingTransferCreatedAt: proc.pendingTransferCreatedAt,
         location: proc.location,
