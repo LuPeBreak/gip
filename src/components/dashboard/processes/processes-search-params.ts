@@ -10,6 +10,7 @@ import {
 export const statusParser = parseAsString.withDefault("");
 export const ownerIdParser = parseAsString.withDefault("");
 export const locationFilterParser = parseAsString.withDefault("");
+export const sectorIdParser = parseAsString.withDefault("");
 
 export const processesSearchParamsCache = createSearchParamsCache({
   page: pageParser,
@@ -18,6 +19,7 @@ export const processesSearchParamsCache = createSearchParamsCache({
   status: statusParser,
   ownerId: ownerIdParser,
   location: locationFilterParser,
+  sectorId: sectorIdParser,
   orderBy: orderByParser,
   order: orderParser,
 });

@@ -16,6 +16,7 @@ import {
   locationFilterParser,
   ownerIdParser,
   searchParser,
+  sectorIdParser,
   statusParser,
 } from "./processes-search-params";
 
@@ -24,12 +25,19 @@ interface UserOption {
   name: string;
 }
 
+interface SectorOption {
+  id: string;
+  name: string;
+}
+
 interface ProcessesDataTableToolbarProps {
   users: UserOption[];
+  sectors: SectorOption[];
 }
 
 export function ProcessesDataTableToolbar({
   users,
+  sectors,
 }: ProcessesDataTableToolbarProps) {
   const [isPending, startTransition] = useTransition();
 
@@ -53,8 +61,17 @@ export function ProcessesDataTableToolbar({
     locationFilterParser.withOptions({ shallow: false, startTransition }),
   );
 
+  const [sectorId, setSectorId] = useQueryState(
+    "sectorId",
+    sectorIdParser.withOptions({ shallow: false, startTransition }),
+  );
+
   const isFiltered =
-    search !== "" || status !== "" || ownerId !== "" || location !== "";
+    search !== "" ||
+    status !== "" ||
+    ownerId !== "" ||
+    location !== "" ||
+    sectorId !== "";
 
   return (
     <div className="flex items-center justify-between">
@@ -118,6 +135,23 @@ export function ProcessesDataTableToolbar({
           </SelectContent>
         </Select>
 
+        <Select
+          value={sectorId || "all"}
+          onValueChange={(value) => setSectorId(value === "all" ? "" : value)}
+        >
+          <SelectTrigger className="h-9 w-[180px]">
+            <SelectValue placeholder="Setor" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os Setores</SelectItem>
+            {sectors.map((sector) => (
+              <SelectItem key={sector.id} value={sector.id}>
+                {sector.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         {isFiltered && (
           <Button
             variant="ghost"
@@ -126,6 +160,7 @@ export function ProcessesDataTableToolbar({
               setStatus("");
               setOwnerId("");
               setLocation("");
+              setSectorId("");
             }}
             className="h-8 px-2 lg:px-3"
           >

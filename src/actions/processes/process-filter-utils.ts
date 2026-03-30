@@ -3,6 +3,7 @@ export interface ProcessFilterParams {
   status?: string;
   location?: string;
   ownerId?: string;
+  sectorId?: string;
 }
 
 export function buildProcessWhereClause(
@@ -11,6 +12,7 @@ export function buildProcessWhereClause(
   const search = params?.search ?? "";
   const status = params?.status ?? "";
   const location = params?.location ?? "";
+  const sectorId = params?.sectorId ?? "";
 
   const where: Record<string, unknown> = {};
 
@@ -35,6 +37,10 @@ export function buildProcessWhereClause(
 
   if (params?.ownerId) {
     where.ownerId = params.ownerId;
+  }
+
+  if (sectorId) {
+    where.owner = { sectorId: sectorId };
   }
 
   return where;
