@@ -36,7 +36,7 @@ export function RejectTransferDialog({
     startTransition(async () => {
       const response = await rejectTransfer({
         processId: transfer.processId,
-        reason: reason || undefined,
+        reason: reason.trim(),
       });
 
       if (response.success) {
@@ -81,7 +81,7 @@ export function RejectTransferDialog({
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <label htmlFor="reject-reason" className="text-sm font-medium">
-              Motivo da rejeição (opcional)
+              Motivo da rejeição <span className="text-destructive">*</span>
             </label>
             <Textarea
               id="reject-reason"
@@ -109,7 +109,7 @@ export function RejectTransferDialog({
             type="button"
             variant="destructive"
             onClick={handleReject}
-            disabled={isPending}
+            disabled={isPending || !reason.trim()}
             className="h-9 min-w-[120px]"
           >
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

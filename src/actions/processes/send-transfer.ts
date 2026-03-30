@@ -7,6 +7,7 @@ import {
   createSuccessResponse,
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
+import { notifyTransferSent } from "@/lib/email/notifications";
 import { prisma } from "@/lib/prisma";
 
 const sendTransferSchema = z.object({
@@ -89,6 +90,22 @@ export const sendTransfer = withPermissions(
           },
         }),
       ]);
+
+      try {
+        await notifyTransferSent(
+          {
+            id: process.id,
+            number: process.number,
+            description: process.description,
+          },
+          session.user.name,
+          toUser.email,
+          toUser.name,
+          observation,
+        );
+      } catch (error) {
+        console.error("Falha ao enviar email de tramitação:", error);
+      }
 
       return createSuccessResponse();
     } catch (error) {
