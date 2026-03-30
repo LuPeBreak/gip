@@ -7,11 +7,12 @@ import {
   createSuccessResponse,
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
+import { notifyTransferRejected } from "@/lib/email/notifications";
 import { prisma } from "@/lib/prisma";
 
 const rejectTransferSchema = z.object({
   processId: z.string(),
-  reason: z.string().optional(),
+  reason: z.string().min(1, "Motivo da rejeição é obrigatório"),
 });
 
 export const rejectTransfer = withPermissions(
@@ -57,10 +58,28 @@ export const rejectTransfer = withPermissions(
             actorId: session.user.id,
             fromUserId: process.ownerId,
             toUserId: session.user.id,
-            observation: reason || null,
+            observation: reason,
           },
         }),
       ]);
+
+      try {
+        if (process.owner) {
+          await notifyTransferRejected(
+            {
+              id: process.id,
+              number: process.number,
+              description: process.description,
+            },
+            session.user.name,
+            process.owner.email,
+            process.owner.name,
+            reason,
+          );
+        }
+      } catch (error) {
+        console.error("Falha ao enviar email de rejeição:", error);
+      }
 
       return createSuccessResponse();
     } catch (error) {

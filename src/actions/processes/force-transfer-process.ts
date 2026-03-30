@@ -7,6 +7,11 @@ import {
   createSuccessResponse,
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
+import {
+  notifyForceTransfer,
+  notifyProcessTransferredByAdmin,
+  notifyTakeOver,
+} from "@/lib/email/notifications";
 import { prisma } from "@/lib/prisma";
 
 const forceTransferSchema = z.object({
@@ -76,6 +81,58 @@ export const forceTransferProcess = withPermissions(
           },
         }),
       ]);
+
+      try {
+        const processInfo = {
+          id: process.id,
+          number: process.number,
+          description: process.description,
+        };
+
+        if (isTakeOver) {
+          if (process.ownerId) {
+            const previousOwner = await prisma.user.findUnique({
+              where: { id: process.ownerId },
+            });
+            if (previousOwner) {
+              await notifyTakeOver(
+                processInfo,
+                session.user.name,
+                previousOwner.email,
+                previousOwner.name,
+                reason,
+              );
+            }
+          }
+        } else {
+          const previousOwner = process.ownerId
+            ? await prisma.user.findUnique({
+                where: { id: process.ownerId },
+              })
+            : null;
+
+          await notifyForceTransfer(
+            processInfo,
+            session.user.name,
+            targetUser.email,
+            targetUser.name,
+            previousOwner?.name ?? "Desconhecido",
+            reason,
+          );
+
+          if (previousOwner) {
+            await notifyProcessTransferredByAdmin(
+              processInfo,
+              targetUser.name,
+              previousOwner.email,
+              previousOwner.name,
+              reason,
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Falha ao enviar email de transferência forçada:", error);
+      }
 
       return createSuccessResponse();
     } catch (error) {
