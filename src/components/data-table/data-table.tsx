@@ -45,8 +45,12 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        {toolbar && toolbar}
-        {tableActions && <div className="ml-auto">{tableActions}</div>}
+        {toolbar && <div key="toolbar">{toolbar}</div>}
+        {tableActions && (
+          <div key="table-actions" className="ml-auto">
+            {tableActions}
+          </div>
+        )}
       </div>
 
       <div className="rounded-md border overflow-hidden">
