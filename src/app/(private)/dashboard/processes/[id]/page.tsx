@@ -7,14 +7,6 @@ import { ProcessDetailAdminActions } from "@/components/dashboard/processes/proc
 import { ProcessHistoryTimeline } from "@/components/dashboard/processes/process-history-timeline";
 import { DashboardPageWrapper } from "@/components/layout/dashboard-page-wrapper";
 import { ProcessStatusBadge } from "@/components/processes/process-status-badge";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -66,24 +58,6 @@ export default async function ProcessDetailsPage({
 
   return (
     <DashboardPageWrapper title={`Processo ${process.number}`}>
-      <Breadcrumb className="mb-6">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/dashboard/processes">Processos</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbPage>{process.number}</BreadcrumbPage>
-        </BreadcrumbList>
-      </Breadcrumb>
-
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <Card>
@@ -113,7 +87,11 @@ export default async function ProcessDetailsPage({
                         Sem posse
                         {process.location && (
                           <span className="not-italic">
-                            {" "}· <span className="text-foreground font-medium">{process.location}</span>
+                            {" "}
+                            ·{" "}
+                            <span className="text-foreground font-medium">
+                              {process.location}
+                            </span>
                           </span>
                         )}
                       </span>
