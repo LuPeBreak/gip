@@ -108,7 +108,11 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      <DataTablePagination table={table} totalCount={totalCount} />
+      <DataTablePagination
+        table={table}
+        totalCount={totalCount}
+        pageCount={pageCount}
+      />
     </div>
   );
 }
