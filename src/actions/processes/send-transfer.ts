@@ -49,7 +49,7 @@ export const sendTransfer = withPermissions(
 
       if (process.ownerId !== session.user.id) {
         return createErrorResponse(
-          "Você só pode tramitir processos que estão sob sua posse.",
+          "Você só pode tramitar processos que estão sob sua posse.",
         );
       }
 
