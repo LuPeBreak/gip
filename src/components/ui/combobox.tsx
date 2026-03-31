@@ -74,7 +74,7 @@ export function Combobox<T>({
       </div>
 
       {open && (
-        <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-popover p-1 shadow-md">
+        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md">
           <div className="flex items-center border-b px-2 py-1.5">
             <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
             <input
@@ -90,7 +90,7 @@ export function Combobox<T>({
           {filteredItems.length === 0 ? (
             <div className="p-2 text-sm text-muted-foreground">{emptyText}</div>
           ) : (
-            <div className="max-h-48 overflow-y-auto p-1">
+            <div className="max-h-60 overflow-y-auto p-1">
               {filteredItems.map((item, index) => {
                 const itemValue = itemToStringValue(item);
                 const isSelected = itemValue === selectedValue;
