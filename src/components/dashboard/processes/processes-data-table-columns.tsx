@@ -69,8 +69,8 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
         return <span className="text-muted-foreground">—</span>;
       }
       return (
-        <span className="block truncate" title={location}>
-          {location}
+        <span title={location}>
+          <ProcessStatusBadge status="EXTERNAL" />
         </span>
       );
     },
