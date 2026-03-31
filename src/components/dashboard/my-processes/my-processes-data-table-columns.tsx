@@ -5,7 +5,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { MyProcessItem } from "@/actions/processes/get-my-processes";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { ProcessStatusBadge } from "@/components/processes/process-status-badge";
-import { Badge } from "@/components/ui/badge";
+import { ProcessTransferBadge } from "@/components/processes/process-transfer-badge";
 import { MyProcessesDataTableRowActions } from "./my-processes-data-table-row-actions";
 
 export const myProcessesColumns: ColumnDef<MyProcessItem>[] = [
@@ -56,11 +56,7 @@ export const myProcessesColumns: ColumnDef<MyProcessItem>[] = [
       const pendingToUserName = row.original.pendingTransferToUserName;
       if (!pendingToUserId) return null;
 
-      return (
-        <Badge variant="outline" className="gap-1">
-          Para: {pendingToUserName ?? "Desconhecido"}
-        </Badge>
-      );
+      return <ProcessTransferBadge userName={pendingToUserName ?? "Unknown"} />;
     },
   },
   {
