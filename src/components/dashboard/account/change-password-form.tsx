@@ -66,7 +66,11 @@ export function ChangePasswordForm() {
         currentPassword: data.currentPassword,
       });
       if (error) {
-        toast.error(error.message || "Erro ao alterar senha");
+        const translatedMessage =
+          error.message === "Invalid password"
+            ? "Senha atual incorreta"
+            : error.message || "Erro ao alterar senha";
+        toast.error(translatedMessage);
       } else {
         toast.success("Senha alterada com sucesso!");
         reset({

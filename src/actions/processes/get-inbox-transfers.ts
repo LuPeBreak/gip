@@ -40,18 +40,16 @@ export const getInboxTransfers = withPermissions(
         },
       });
 
-      const result: InboxTransferItem[] = processes
-        .filter((p) => p.owner && p.pendingTransferCreatedAt)
-        .map((p) => ({
-          id: p.id,
-          processId: p.id,
-          processNumber: p.number,
-          processDescription: p.description,
-          fromUserId: p.owner?.id ?? "",
-          fromUserName: p.owner?.name ?? "",
-          observation: p.pendingTransferObservation,
-          createdAt: p.pendingTransferCreatedAt as Date,
-        }));
+      const result: InboxTransferItem[] = processes.map((p) => ({
+        id: p.id,
+        processId: p.id,
+        processNumber: p.number,
+        processDescription: p.description,
+        fromUserId: p.owner?.id ?? "",
+        fromUserName: p.owner?.name ?? "",
+        observation: p.pendingTransferObservation,
+        createdAt: p.pendingTransferCreatedAt as Date,
+      }));
 
       return createSuccessResponse(result);
     } catch (error) {

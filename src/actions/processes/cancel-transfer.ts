@@ -43,6 +43,17 @@ export const cancelTransfer = withPermissions(
         );
       }
 
+      const pendingEvent = await prisma.processEvent.findFirst({
+        where: {
+          processId,
+          type: "TRANSFER_SENT",
+          actorId: session.user.id,
+          toUserId: process.pendingTransferToUserId,
+        },
+        orderBy: { createdAt: "desc" },
+        select: { id: true },
+      });
+
       await prisma.$transaction([
         prisma.process.update({
           where: { id: processId },
@@ -52,14 +63,13 @@ export const cancelTransfer = withPermissions(
             pendingTransferCreatedAt: null,
           },
         }),
-        prisma.processEvent.deleteMany({
-          where: {
-            processId,
-            type: "TRANSFER_SENT",
-            actorId: session.user.id,
-            toUserId: process.pendingTransferToUserId,
-          },
-        }),
+        ...(pendingEvent
+          ? [
+              prisma.processEvent.delete({
+                where: { id: pendingEvent.id },
+              }),
+            ]
+          : []),
       ]);
 
       revalidatePath("/dashboard/my-processes");
