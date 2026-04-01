@@ -4,6 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { ProcessItem } from "@/actions/processes/get-processes";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { ProcessStatusBadge } from "@/components/processes/process-status-badge";
+import { formatDateShort } from "@/lib/utils/date-formatters";
 import { ProcessesDataTableRowActions } from "./processes-data-table-row-actions";
 
 export const processesColumns: ColumnDef<ProcessItem>[] = [
@@ -20,9 +21,8 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
   },
   {
     accessorKey: "description",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Descrição" />
-    ),
+    enableSorting: false,
+    header: "Descrição",
     size: 350,
     cell: ({ row }) => {
       const description = row.getValue("description") as string;
@@ -35,9 +35,8 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
   },
   {
     accessorKey: "ownerName",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Posse Atual" />
-    ),
+    enableSorting: false,
+    header: "Posse Atual",
     size: 150,
     cell: ({ row }) => {
       const ownerName = row.original.ownerName;
@@ -68,29 +67,17 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
       if (!location) {
         return <span className="text-muted-foreground">—</span>;
       }
-      return (
-        <span title={location}>
-          <ProcessStatusBadge status="EXTERNAL" />
-        </span>
-      );
+      return <ProcessStatusBadge status="EXTERNAL" tooltip={location} />;
     },
   },
   {
     accessorKey: "createdAt",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Cadastrado em" />
-    ),
+    enableSorting: false,
+    header: "Cadastrado em",
     size: 120,
     cell: ({ row }) => {
       const date = row.original.createdAt;
-      return (
-        <span>
-          {new Intl.DateTimeFormat("pt-BR", {
-            dateStyle: "short",
-            timeStyle: "short",
-          }).format(date)}
-        </span>
-      );
+      return <span>{formatDateShort(date)}</span>;
     },
   },
   {

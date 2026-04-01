@@ -1,18 +1,26 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface ProcessStatusBadgeProps {
   status: "OPEN" | "FINISHED" | "EXTERNAL";
   className?: string;
+  tooltip?: string;
 }
 
 export function ProcessStatusBadge({
   status,
   className,
+  tooltip,
 }: ProcessStatusBadgeProps) {
-  const baseClass = "w-24 justify-center pointer-events-none";
+  const baseClass = "w-24 justify-center";
 
   if (status === "FINISHED") {
     return (
@@ -23,7 +31,7 @@ export function ProcessStatusBadge({
   }
 
   if (status === "EXTERNAL") {
-    return (
+    const badge = (
       <Badge
         variant="outline"
         className={cn(
@@ -35,6 +43,21 @@ export function ProcessStatusBadge({
         Externo
       </Badge>
     );
+
+    if (tooltip) {
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>{badge}</TooltipTrigger>
+            <TooltipContent side="top">
+              <p>{tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    }
+
+    return badge;
   }
 
   // Default: OPEN

@@ -2,7 +2,8 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
-import { Badge } from "@/components/ui/badge";
+import { RoleBadge } from "@/components/users/role-badge";
+import { StatusBadge } from "@/components/users/status-badge";
 import { UsersDataTableRowActions } from "./users-data-table-row-actions";
 
 // This type is used to define the shape of our data.
@@ -37,11 +38,7 @@ export const usersColumns: ColumnDef<UserColumn>[] = [
     ),
     cell: ({ row }) => {
       const role = row.getValue("role") as string;
-      return (
-        <Badge variant={role === "admin" ? "default" : "secondary"}>
-          {role || "user"}
-        </Badge>
-      );
+      return <RoleBadge role={role} />;
     },
   },
   {
@@ -59,12 +56,8 @@ export const usersColumns: ColumnDef<UserColumn>[] = [
     accessorKey: "banned",
     header: "Status",
     cell: ({ row }) => {
-      const isBanned = row.getValue("banned") as boolean;
-      return (
-        <Badge variant={isBanned ? "destructive" : "outline"}>
-          {isBanned ? "Banido" : "Ativo"}
-        </Badge>
-      );
+      const isBanned = row.getValue("banned") as boolean | null;
+      return <StatusBadge isBanned={isBanned} />;
     },
   },
   {
