@@ -71,13 +71,13 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
     },
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "updatedAt",
     enableSorting: false,
-    header: "Cadastrado em",
+    header: "Última Atualização",
     size: 120,
     cell: ({ row }) => {
-      const date = row.original.createdAt;
-      return <span>{formatDateShort(date)}</span>;
+      const date = row.original.updatedAt;
+      return <span>{date ? formatDateShort(date) : "—"}</span>;
     },
   },
   {

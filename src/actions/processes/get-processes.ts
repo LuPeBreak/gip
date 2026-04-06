@@ -44,8 +44,8 @@ export const getAllProcesses = withPermissions(
         "createdAt",
         "updatedAt",
         "number",
-        "description",
         "status",
+        "location",
       ];
       const safeOrderBy = validOrderByFields.includes(orderBy)
         ? orderBy
@@ -63,9 +63,7 @@ export const getAllProcesses = withPermissions(
             },
           },
         },
-        orderBy: {
-          [safeOrderBy]: order,
-        },
+        orderBy: { [safeOrderBy]: order },
         skip: (page - 1) * pageSize,
         take: pageSize,
       });
@@ -81,6 +79,7 @@ export const getAllProcesses = withPermissions(
         ownerName: proc.owner?.name ?? null,
         ownerSectorName: proc.owner?.sector?.name ?? null,
         createdAt: proc.createdAt,
+        updatedAt: proc.updatedAt,
         location: proc.location,
       }));
 
