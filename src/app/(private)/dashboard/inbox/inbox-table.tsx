@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatDateShort } from "@/lib/utils/date-formatters";
 
 interface InboxTableProps {
   transfers: InboxTransferItem[];
@@ -49,13 +50,7 @@ export function InboxTable({ transfers }: InboxTableProps) {
               <TableCell>{transfer.fromUserName}</TableCell>
               <TableCell>{transfer.observation || "-"}</TableCell>
               <TableCell>
-                {new Date(transfer.createdAt).toLocaleDateString("pt-BR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {formatDateShort(new Date(transfer.createdAt))}
               </TableCell>
               <TableCell>
                 {inboxColumns[5].cell?.({ row: { original: transfer } })}

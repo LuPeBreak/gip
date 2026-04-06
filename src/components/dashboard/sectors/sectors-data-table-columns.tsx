@@ -2,6 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { formatDateLong } from "@/lib/utils/date-formatters";
 import { SectorsDataTableRowActions } from "./sectors-data-table-row-actions";
 
 export type SectorColumn = {
@@ -47,11 +48,7 @@ export const sectorsColumns: ColumnDef<SectorColumn>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue("createdAt") as Date;
-      return (
-        <span>
-          {new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(date)}
-        </span>
-      );
+      return <span>{formatDateLong(date)}</span>;
     },
   },
   {

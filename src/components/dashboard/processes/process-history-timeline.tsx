@@ -1,15 +1,9 @@
 import { getProcessHistory } from "@/actions/processes/get-process-history";
+import { formatDateMedium } from "@/lib/utils/date-formatters";
 import { PROCESS_EVENT_CONFIG } from "./process-event-constants";
 
 interface ProcessHistoryTimelineProps {
   processId: string;
-}
-
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
 }
 
 function getEventDescription(
@@ -223,7 +217,7 @@ export async function ProcessHistoryTimeline({
                   </p>
                 </div>
                 <span className="shrink-0 text-[10px] text-muted-foreground">
-                  {formatDate(event.createdAt)}
+                  {formatDateMedium(event.createdAt)}
                 </span>
               </div>
 

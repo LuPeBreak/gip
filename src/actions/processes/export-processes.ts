@@ -8,6 +8,7 @@ import {
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
 import { prisma } from "@/lib/prisma";
+import { formatDateForExcel } from "@/lib/utils/date-formatters";
 import {
   buildProcessWhereClause,
   type ProcessFilterParams,
@@ -92,11 +93,11 @@ export const exportProcesses = withPermissions(
           description: proc.description,
           status: statusText,
           location: locationText,
-          updatedAt: proc.updatedAt,
+          updatedAt: formatDateForExcel(proc.updatedAt),
         });
 
         const dateCell = row.getCell("updatedAt");
-        dateCell.numFmt = "DD/MM/YYYY HH:mm";
+        dateCell.alignment = { horizontal: "center" };
 
         for (let col = 1; col <= colCount; col++) {
           const cell = row.getCell(col);

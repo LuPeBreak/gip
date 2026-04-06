@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import type { InboxTransferItem } from "@/actions/processes/get-inbox-transfers";
 import { Button } from "@/components/ui/button";
+import { formatDateShort } from "@/lib/utils/date-formatters";
 import { AcceptTransferDialog } from "./accept-transfer-dialog";
 import { RejectTransferDialog } from "./reject-transfer-dialog";
 
@@ -95,13 +96,7 @@ export const inboxColumns = [
     accessorKey: "createdAt",
     header: "Data",
     cell: ({ row }: { row: { original: InboxTransferItem } }) => {
-      return new Date(row.original.createdAt).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      return formatDateShort(new Date(row.original.createdAt));
     },
   },
   {

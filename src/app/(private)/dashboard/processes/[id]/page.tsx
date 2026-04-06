@@ -17,13 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { auth } from "@/lib/auth/auth";
-
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
-}
+import { formatDateMedium } from "@/lib/utils/date-formatters";
 
 export default async function ProcessDetailsPage({
   params,
@@ -98,7 +92,7 @@ export default async function ProcessDetailsPage({
                     )}
                     <span className="flex items-center gap-1.5">
                       <Calendar className="h-3.5 w-3.5" />
-                      {formatDate(process.createdAt)}
+                      {formatDateMedium(process.createdAt)}
                     </span>
                   </CardDescription>
                 </div>
@@ -143,7 +137,7 @@ export default async function ProcessDetailsPage({
                 <div className="flex justify-between gap-4">
                   <dt className="text-muted-foreground">Última atualização</dt>
                   <dd className="font-medium text-right">
-                    {formatDate(process.updatedAt)}
+                    {formatDateMedium(process.updatedAt)}
                   </dd>
                 </div>
               </dl>
