@@ -55,6 +55,7 @@ export const exportProcesses = withPermissions(
         { header: "Descrição", key: "description", width: 40 },
         { header: "Status", key: "status", width: 15 },
         { header: "Localização", key: "location", width: 25 },
+        { header: "Origem", key: "externalOrigin", width: 20 },
         { header: "Última Movimentação", key: "updatedAt", width: 22 },
       ];
 
@@ -93,6 +94,7 @@ export const exportProcesses = withPermissions(
           description: proc.description,
           status: statusText,
           location: locationText,
+          externalOrigin: proc.externalOrigin ?? "",
           updatedAt: formatDateForExcel(proc.updatedAt),
         });
 
