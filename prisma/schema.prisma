@@ -135,6 +135,8 @@ model Process {
 
   location String? // null = interno, texto = externo
 
+  externalOrigin String?
+
   events ProcessEvent[]
 
   createdAt DateTime @default(now())

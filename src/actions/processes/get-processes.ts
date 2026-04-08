@@ -78,9 +78,9 @@ export const getAllProcesses = withPermissions(
         ownerId: proc.ownerId,
         ownerName: proc.owner?.name ?? null,
         ownerSectorName: proc.owner?.sector?.name ?? null,
-        createdAt: proc.createdAt,
         updatedAt: proc.updatedAt,
         location: proc.location,
+        externalOrigin: proc.externalOrigin,
       }));
 
       return createSuccessResponse({

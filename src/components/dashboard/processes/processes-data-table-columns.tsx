@@ -71,6 +71,23 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
     },
   },
   {
+    accessorKey: "externalOrigin",
+    enableSorting: false,
+    header: "Origem",
+    size: 130,
+    cell: ({ row }) => {
+      const externalOrigin = row.original.externalOrigin;
+      if (!externalOrigin) {
+        return <span className="text-muted-foreground">—</span>;
+      }
+      return (
+        <span className="truncate" title={externalOrigin}>
+          {externalOrigin}
+        </span>
+      );
+    },
+  },
+  {
     accessorKey: "updatedAt",
     enableSorting: false,
     header: "Última Atualização",

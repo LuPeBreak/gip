@@ -52,6 +52,7 @@ export function ProcessDialog({
     defaultValues: {
       number: "",
       description: "",
+      externalOrigin: "",
     },
   });
 
@@ -61,9 +62,10 @@ export function ProcessDialog({
         reset({
           number: process.number,
           description: process.description,
+          externalOrigin: process.externalOrigin ?? "",
         });
       } else {
-        reset({ number: "", description: "" });
+        reset({ number: "", description: "", externalOrigin: "" });
       }
     }
   }, [open, isEdit, process, reset]);
@@ -72,10 +74,15 @@ export function ProcessDialog({
     startTransition(async () => {
       let response: ActionResponse<void>;
 
+      const submitData = {
+        ...data,
+        externalOrigin: data.externalOrigin || null,
+      };
+
       if (isEdit && process) {
-        response = await updateProcess({ ...data, id: process.id });
+        response = await updateProcess({ ...submitData, id: process.id });
       } else {
-        response = await createProcess(data);
+        response = await createProcess(submitData);
       }
 
       if (response.success) {
@@ -152,6 +159,28 @@ export function ProcessDialog({
                   />
                   {errors.description?.message && (
                     <FieldError>{errors.description.message}</FieldError>
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="externalOrigin"
+              control={control}
+              render={({ field }) => (
+                <Field data-invalid={!!errors.externalOrigin}>
+                  <FieldLabel htmlFor="process-origin">
+                    Origem Externa (opcional)
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="process-origin"
+                    placeholder="Ex: TI, Recursos Humanos, etc"
+                    disabled={isPending}
+                    value={field.value ?? ""}
+                  />
+                  {errors.externalOrigin?.message && (
+                    <FieldError>{errors.externalOrigin.message}</FieldError>
                   )}
                 </Field>
               )}

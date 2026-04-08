@@ -1,4 +1,4 @@
-import { Calendar, FileText, History, User } from "lucide-react";
+import { Calendar, FileText, History, MapPin, User } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -66,6 +66,12 @@ export default async function ProcessDetailsPage({
                     <ProcessStatusBadge status={process.status} />
                   </div>
                   <CardDescription className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1">
+                    {process.externalOrigin && (
+                      <span className="flex items-center gap-1.5">
+                        <MapPin className="h-3.5 w-3.5" />
+                        Origem: {process.externalOrigin}
+                      </span>
+                    )}
                     {process.ownerName ? (
                       <span className="flex items-center gap-1.5">
                         <User className="h-3.5 w-3.5" />

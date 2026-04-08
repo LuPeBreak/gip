@@ -10,9 +10,15 @@ export const createProcessSchema = z.object({
     .min(1, "Número é obrigatório")
     .regex(processNumberRegex, processNumberMessage)
     .max(15, "Número deve ter no máximo 15 caracteres"),
-  description: z.string()
-  .min(1, "Descrição é obrigatória")
-  .max(500, "Descrição deve ter no máximo 500 caracteres"),
+  description: z
+    .string()
+    .min(1, "Descrição é obrigatória")
+    .max(500, "Descrição deve ter no máximo 500 caracteres"),
+  externalOrigin: z
+    .string()
+    .max(50, "Origem externa deve ter no máximo 50 caracteres")
+    .optional()
+    .nullable(),
 });
 
 export type CreateProcessData = z.infer<typeof createProcessSchema>;

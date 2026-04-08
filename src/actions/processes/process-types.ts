@@ -8,11 +8,12 @@ export type ProcessBase = {
   ownerId: string | null;
   ownerName: string | null;
   ownerSectorName: string | null;
-  createdAt: Date;
+  createdAt?: Date;
   updatedAt?: Date;
   pendingTransferToUserId?: string | null;
   pendingTransferToUserName?: string | null;
   pendingTransferObservation?: string | null;
   pendingTransferCreatedAt?: Date | null;
   location?: string | null;
+  externalOrigin?: string | null;
 };

@@ -10,6 +10,7 @@ import { prisma } from "@/lib/prisma";
 import type { ProcessBase } from "./process-types";
 
 export type ProcessDetail = ProcessBase & {
+  createdAt: Date;
   updatedAt: Date;
 };
 
@@ -46,6 +47,7 @@ export const getProcessById = withPermissions(
         createdAt: process.createdAt,
         updatedAt: process.updatedAt,
         location: process.location,
+        externalOrigin: process.externalOrigin,
       });
     } catch (error) {
       console.error("Erro ao buscar processo por ID:", error);

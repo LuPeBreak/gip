@@ -29,6 +29,7 @@ export const updateProcess = withPermissions(
 
       const oldNumber = existing.number;
       const oldDescription = existing.description;
+      const oldExternalOrigin = existing.externalOrigin;
 
       const duplicate = await prisma.process.findUnique({
         where: { number: parsedData.number },
@@ -56,6 +57,14 @@ export const updateProcess = withPermissions(
         });
       }
 
+      if (oldExternalOrigin !== parsedData.externalOrigin) {
+        fields.push({
+          name: "externalOrigin",
+          from: oldExternalOrigin ?? "",
+          to: parsedData.externalOrigin ?? "",
+        });
+      }
+
       if (fields.length > 0) {
         await prisma.$transaction([
           prisma.process.update({
@@ -63,6 +72,7 @@ export const updateProcess = withPermissions(
             data: {
               number: parsedData.number,
               description: parsedData.description,
+              externalOrigin: parsedData.externalOrigin ?? null,
             },
           }),
           prisma.processEvent.create({
@@ -74,20 +84,14 @@ export const updateProcess = withPermissions(
             },
           }),
         ]);
-      } else {
-        await prisma.process.update({
-          where: { id: parsedData.id },
-          data: {
-            number: parsedData.number,
-            description: parsedData.description,
-          },
-        });
+
+        revalidatePath("/dashboard/processes");
+        revalidatePath("/dashboard");
+
+        return createSuccessResponse();
       }
 
-      revalidatePath("/dashboard/processes");
-      revalidatePath("/dashboard");
-
-      return createSuccessResponse();
+      return createErrorResponse("Nenhuma alteração detectada.", "NO_CHANGES");
     } catch (error) {
       console.error("Erro ao atualizar processo:", error);
       return createErrorResponse("Erro interno ao atualizar processo.");
