@@ -21,8 +21,9 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
   },
   {
     accessorKey: "description",
-    enableSorting: false,
-    header: "Descrição",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Descrição" />
+    ),
     size: 350,
     cell: ({ row }) => {
       const description = row.getValue("description") as string;
@@ -35,8 +36,9 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
   },
   {
     accessorKey: "ownerName",
-    enableSorting: false,
-    header: "Posse Atual",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Posse Atual" />
+    ),
     size: 150,
     cell: ({ row }) => {
       const ownerName = row.original.ownerName;
@@ -72,8 +74,9 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
   },
   {
     accessorKey: "externalOrigin",
-    enableSorting: false,
-    header: "Origem",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Origem" />
+    ),
     size: 130,
     cell: ({ row }) => {
       const externalOrigin = row.original.externalOrigin;
@@ -89,8 +92,9 @@ export const processesColumns: ColumnDef<ProcessItem>[] = [
   },
   {
     accessorKey: "updatedAt",
-    enableSorting: false,
-    header: "Última Atualização",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Última Atualização" />
+    ),
     size: 120,
     cell: ({ row }) => {
       const date = row.original.updatedAt;

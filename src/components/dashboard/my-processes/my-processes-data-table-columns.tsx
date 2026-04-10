@@ -3,17 +3,13 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
 import type { MyProcessItem } from "@/actions/processes/get-my-processes";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
-import { ProcessStatusBadge } from "@/components/processes/process-status-badge";
 import { ProcessTransferBadge } from "@/components/processes/process-transfer-badge";
 import { MyProcessesDataTableRowActions } from "./my-processes-data-table-row-actions";
 
 export const myProcessesColumns: ColumnDef<MyProcessItem>[] = [
   {
     accessorKey: "number",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Número" />
-    ),
+    header: "Número",
     size: 130,
     cell: ({ row }) => {
       const number = row.getValue("number") as string;
@@ -22,9 +18,7 @@ export const myProcessesColumns: ColumnDef<MyProcessItem>[] = [
   },
   {
     accessorKey: "description",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Descrição" />
-    ),
+    header: "Descrição",
     size: 350,
     cell: ({ row }) => {
       const description = row.original.description;
@@ -34,14 +28,6 @@ export const myProcessesColumns: ColumnDef<MyProcessItem>[] = [
         </span>
       );
     },
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
-    ),
-    size: 80,
-    cell: ({ row }) => <ProcessStatusBadge status={row.original.status} />,
   },
   {
     id: "emTramite",

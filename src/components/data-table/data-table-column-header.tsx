@@ -27,7 +27,6 @@ export function DataTableColumnHeader<TData, TValue>({
   const [isPending, startTransition] = useTransition();
 
   const [orderBy, setOrderBy] = useQueryState("orderBy", {
-    defaultValue: "name", // default sort field, can be made generic later if needed
     shallow: false,
     startTransition,
   });

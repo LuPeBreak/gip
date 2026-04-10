@@ -39,6 +39,8 @@ export function DataTable<TData, TValue>({
     columns,
     pageCount, // Provide total pages from server
     manualPagination: true, // Tell react-table we're handling pagination on server
+    manualFiltering: true,
+    manualSorting: true,
     getCoreRowModel: getCoreRowModel(),
   });
 

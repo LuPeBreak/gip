@@ -7,6 +7,7 @@ import {
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@/lib/prisma/generated/client";
 import { buildProcessWhereClause } from "./process-filter-utils";
 import type { ProcessBase } from "./process-types";
 
@@ -44,12 +45,26 @@ export const getAllProcesses = withPermissions(
         "createdAt",
         "updatedAt",
         "number",
+        "description",
         "status",
         "location",
+        "ownerName",
+        "externalOrigin",
       ];
       const safeOrderBy = validOrderByFields.includes(orderBy)
         ? orderBy
         : "createdAt";
+
+      const orderByClause: Prisma.ProcessOrderByWithRelationInput = {};
+      if (safeOrderBy === "ownerName") {
+        orderByClause.owner = {
+          name: order as "asc" | "desc",
+        };
+      } else {
+        orderByClause[
+          safeOrderBy as keyof Prisma.ProcessOrderByWithRelationInput
+        ] = order;
+      }
 
       const processes = await prisma.process.findMany({
         where,
@@ -63,7 +78,7 @@ export const getAllProcesses = withPermissions(
             },
           },
         },
-        orderBy: { [safeOrderBy]: order },
+        orderBy: orderByClause,
         skip: (page - 1) * pageSize,
         take: pageSize,
       });

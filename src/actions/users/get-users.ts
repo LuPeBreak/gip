@@ -8,6 +8,7 @@ import {
 } from "@/lib/actions/action-utils";
 import { withPermissions } from "@/lib/actions/with-permissions";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@/lib/prisma/generated/client";
 
 export interface GetUsersParams {
   page?: number;
@@ -32,12 +33,28 @@ export const getUsers = withPermissions(
       const orderBy = params?.orderBy ?? "name";
       const order = params?.order ?? "asc";
 
-      const validOrderByFields = ["name", "email", "role", "createdAt"];
+      const validOrderByFields = [
+        "name",
+        "email",
+        "role",
+        "createdAt",
+        "sectorName",
+      ];
       const safeOrderBy = validOrderByFields.includes(orderBy)
         ? orderBy
         : "name";
 
-      // Dynamically extract the "where" type that Prisma expects for User queries.
+      const orderByClause: Prisma.UserOrderByWithRelationInput = {};
+      if (safeOrderBy === "sectorName") {
+        orderByClause.sector = {
+          name: order as "asc" | "desc",
+        };
+      } else {
+        orderByClause[
+          safeOrderBy as keyof Prisma.UserOrderByWithRelationInput
+        ] = order;
+      }
+
       type UserWhereInput = NonNullable<
         Parameters<typeof prisma.user.count>[0]
       >["where"];
@@ -73,9 +90,7 @@ export const getUsers = withPermissions(
               },
             },
           },
-          orderBy: {
-            [safeOrderBy]: order,
-          },
+          orderBy: orderByClause,
           skip: (page - 1) * pageSize,
           take: pageSize,
         }),
