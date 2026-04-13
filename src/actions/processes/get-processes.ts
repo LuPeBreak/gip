@@ -34,7 +34,7 @@ export const getAllProcesses = withPermissions(
     try {
       const page = params?.page ?? 1;
       const pageSize = params?.pageSize ?? 15;
-      const orderBy = params?.orderBy ?? "createdAt";
+      const orderBy = params?.orderBy ?? "updatedAt";
       const order = params?.order ?? "desc";
 
       const where = buildProcessWhereClause(params);
@@ -42,7 +42,6 @@ export const getAllProcesses = withPermissions(
       const totalCount = await prisma.process.count({ where });
 
       const validOrderByFields = [
-        "createdAt",
         "updatedAt",
         "number",
         "description",
@@ -53,7 +52,7 @@ export const getAllProcesses = withPermissions(
       ];
       const safeOrderBy = validOrderByFields.includes(orderBy)
         ? orderBy
-        : "createdAt";
+        : "updatedAt";
 
       const orderByClause: Prisma.ProcessOrderByWithRelationInput = {};
       if (safeOrderBy === "ownerName") {
