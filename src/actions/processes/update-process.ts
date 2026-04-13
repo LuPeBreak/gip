@@ -72,7 +72,7 @@ export const updateProcess = withPermissions(
             data: {
               number: parsedData.number,
               description: parsedData.description,
-              externalOrigin: parsedData.externalOrigin ?? null,
+              externalOrigin: parsedData.externalOrigin,
             },
           }),
           prisma.processEvent.create({

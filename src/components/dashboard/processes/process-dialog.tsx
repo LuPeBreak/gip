@@ -74,15 +74,10 @@ export function ProcessDialog({
     startTransition(async () => {
       let response: ActionResponse<void>;
 
-      const submitData = {
-        ...data,
-        externalOrigin: data.externalOrigin || null,
-      };
-
       if (isEdit && process) {
-        response = await updateProcess({ ...submitData, id: process.id });
+        response = await updateProcess({ ...data, id: process.id });
       } else {
-        response = await createProcess(submitData);
+        response = await createProcess(data);
       }
 
       if (response.success) {
@@ -167,15 +162,16 @@ export function ProcessDialog({
             <Controller
               name="externalOrigin"
               control={control}
+              rules={{ required: true }}
               render={({ field }) => (
                 <Field data-invalid={!!errors.externalOrigin}>
                   <FieldLabel htmlFor="process-origin">
-                    Origem Externa (opcional)
+                    Origem Externa
                   </FieldLabel>
                   <Input
                     {...field}
                     id="process-origin"
-                    placeholder="Ex: TI, Recursos Humanos, etc"
+                    placeholder="Ex: TI, Recursos Humanos, Licitação"
                     disabled={isPending}
                     value={field.value ?? ""}
                   />
