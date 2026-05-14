@@ -18,6 +18,10 @@ export const createProcessSchema = z.object({
     .string()
     .min(1, "Origem é obrigatória")
     .max(50, "Origem externa deve ter no máximo 50 caracteres"),
+  observation: z
+    .string()
+    .max(500, "Observação deve ter no máximo 500 caracteres")
+    .optional(),
 });
 
 export type CreateProcessData = z.infer<typeof createProcessSchema>;

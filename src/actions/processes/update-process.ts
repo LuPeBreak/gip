@@ -30,6 +30,7 @@ export const updateProcess = withPermissions(
       const oldNumber = existing.number;
       const oldDescription = existing.description;
       const oldExternalOrigin = existing.externalOrigin;
+      const oldObservation = existing.observation;
 
       const duplicate = await prisma.process.findUnique({
         where: { number: parsedData.number },
@@ -65,6 +66,14 @@ export const updateProcess = withPermissions(
         });
       }
 
+      if (oldObservation !== (parsedData.observation ?? null)) {
+        fields.push({
+          name: "observation",
+          from: oldObservation ?? "",
+          to: parsedData.observation ?? "",
+        });
+      }
+
       if (fields.length > 0) {
         await prisma.$transaction([
           prisma.process.update({
@@ -73,6 +82,7 @@ export const updateProcess = withPermissions(
               number: parsedData.number,
               description: parsedData.description,
               externalOrigin: parsedData.externalOrigin,
+              observation: parsedData.observation,
             },
           }),
           prisma.processEvent.create({

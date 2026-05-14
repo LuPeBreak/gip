@@ -53,6 +53,7 @@ export function ProcessDialog({
       number: "",
       description: "",
       externalOrigin: "",
+      observation: "",
     },
   });
 
@@ -63,9 +64,15 @@ export function ProcessDialog({
           number: process.number,
           description: process.description,
           externalOrigin: process.externalOrigin ?? "",
+          observation: process.observation ?? "",
         });
       } else {
-        reset({ number: "", description: "", externalOrigin: "" });
+        reset({
+          number: "",
+          description: "",
+          externalOrigin: "",
+          observation: "",
+        });
       }
     }
   }, [open, isEdit, process, reset]);
@@ -124,7 +131,9 @@ export function ProcessDialog({
               control={control}
               render={({ field }) => (
                 <Field data-invalid={!!errors.number}>
-                  <FieldLabel htmlFor="process-number">Número</FieldLabel>
+                  <FieldLabel htmlFor="process-number">
+                    Número <span className="text-destructive">*</span>
+                  </FieldLabel>
                   <Input
                     {...field}
                     id="process-number"
@@ -144,7 +153,7 @@ export function ProcessDialog({
               render={({ field }) => (
                 <Field data-invalid={!!errors.description}>
                   <FieldLabel htmlFor="process-description">
-                    Descrição
+                    Descrição <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Input
                     {...field}
@@ -166,7 +175,7 @@ export function ProcessDialog({
               render={({ field }) => (
                 <Field data-invalid={!!errors.externalOrigin}>
                   <FieldLabel htmlFor="process-origin">
-                    Origem Externa
+                    Origem Externa <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Input
                     {...field}
@@ -177,6 +186,27 @@ export function ProcessDialog({
                   />
                   {errors.externalOrigin?.message && (
                     <FieldError>{errors.externalOrigin.message}</FieldError>
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="observation"
+              control={control}
+              render={({ field }) => (
+                <Field data-invalid={!!errors.observation}>
+                  <FieldLabel htmlFor="process-observation">
+                    Observação
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="process-observation"
+                    placeholder="Ex: Informações adicionais sobre o processo"
+                    disabled={isPending}
+                  />
+                  {errors.observation?.message && (
+                    <FieldError>{errors.observation.message}</FieldError>
                   )}
                 </Field>
               )}

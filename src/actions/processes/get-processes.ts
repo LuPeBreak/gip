@@ -95,6 +95,7 @@ export const getAllProcesses = withPermissions(
         updatedAt: proc.updatedAt,
         location: proc.location,
         externalOrigin: proc.externalOrigin,
+        observation: proc.observation,
       }));
 
       return createSuccessResponse({

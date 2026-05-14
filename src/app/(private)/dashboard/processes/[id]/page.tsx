@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProcessById } from "@/actions/processes/get-process-by-id";
 import { ProcessDetailAdminActions } from "@/components/dashboard/processes/process-detail-admin-actions";
+import { ProcessDetailEditObservationButton } from "@/components/dashboard/processes/process-detail-edit-observation-button";
 import { ProcessHistoryTimeline } from "@/components/dashboard/processes/process-history-timeline";
 import { DashboardPageWrapper } from "@/components/layout/dashboard-page-wrapper";
 import { ProcessStatusBadge } from "@/components/processes/process-status-badge";
@@ -114,6 +115,16 @@ export default async function ProcessDetailsPage({
                   {process.description}
                 </p>
               </div>
+              {process.observation && (
+                <div className="space-y-2 pt-4">
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    Observação
+                  </h3>
+                  <p className="text-base leading-relaxed">
+                    {process.observation}
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -151,6 +162,8 @@ export default async function ProcessDetailsPage({
           </Card>
 
           {canIntervene && <ProcessDetailAdminActions process={process} />}
+
+          <ProcessDetailEditObservationButton process={process} />
 
           <Button variant="outline" asChild className="w-full">
             <Link href="/dashboard/processes">

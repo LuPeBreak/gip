@@ -16,4 +16,5 @@ export type ProcessBase = {
   pendingTransferCreatedAt?: Date | null;
   location?: string | null;
   externalOrigin?: string | null;
+  observation?: string | null;
 };

@@ -120,30 +120,31 @@ enum ProcessEventEnum {
 }
 
 model Process {
-  id          String        @id @default(cuid())
-  number      String        @unique
-  description String
-  status      ProcessStatus @default(OPEN)
+   id          String        @id @default(cuid())
+   number      String        @unique
+   description String
+   status      ProcessStatus @default(OPEN)
+   observation String?
 
-  ownerId String?
-  owner   User?   @relation("ProcessOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+   ownerId String?
+   owner   User?   @relation("ProcessOwner", fields: [ownerId], references: [id], onDelete: Restrict)
 
-  pendingTransferToUserId    String?
-  pendingTransferToUser      User?   @relation("ProcessPendingTransferTo", fields: [pendingTransferToUserId], references: [id], onDelete: SetNull)
-  pendingTransferObservation String?
-  pendingTransferCreatedAt   DateTime?
+   pendingTransferToUserId    String?
+   pendingTransferToUser      User?   @relation("ProcessPendingTransferTo", fields: [pendingTransferToUserId], references: [id], onDelete: SetNull)
+   pendingTransferObservation String?
+   pendingTransferCreatedAt   DateTime?
 
-  location String? // null = interno, texto = externo
+   location String? // null = interno, texto = externo
 
-  externalOrigin String?
+   externalOrigin String?
 
-  events ProcessEvent[]
+   events ProcessEvent[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
 
-  @@map("process")
-}
+   @@map("process")
+ }
 
 model ProcessEvent {
   id        String           @id @default(cuid())

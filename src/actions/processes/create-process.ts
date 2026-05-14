@@ -39,6 +39,7 @@ export const createProcess = withPermissions(
             ownerId: session.user.id,
             status: "OPEN",
             externalOrigin: parsedData.externalOrigin,
+            observation: parsedData.observation,
           },
         });
 

@@ -61,6 +61,7 @@ export function NavUser({
             }}
           >
             <SidebarMenuButton
+              suppressHydrationWarning
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >

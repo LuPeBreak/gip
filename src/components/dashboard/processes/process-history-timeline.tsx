@@ -77,6 +77,7 @@ function DiffsRenderer({
   const fieldLabels: Record<string, string> = {
     number: "Número",
     description: "Descrição",
+    observation: "Observação",
     externalOrigin: "Origem Externa",
   };
 

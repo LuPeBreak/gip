@@ -6,6 +6,7 @@ import {
   Eye,
   MapPin,
   MoreHorizontal,
+  NotepadText,
   Send,
   Trash,
   XCircle,
@@ -15,6 +16,7 @@ import { useEffect, useState } from "react";
 import type { MyProcessItem } from "@/actions/processes/get-my-processes";
 import { CancelTransferDialog } from "@/components/dashboard/processes/cancel-transfer-dialog";
 import { DeleteProcessDialog } from "@/components/dashboard/processes/delete-process-dialog";
+import { EditObservationDialog } from "@/components/dashboard/processes/edit-observation-dialog";
 import { FinishProcessDialog } from "@/components/dashboard/processes/finish-process-dialog";
 import { ProcessDialog } from "@/components/dashboard/processes/process-dialog";
 import { SendToExternalDialog } from "@/components/dashboard/processes/send-to-external-dialog";
@@ -49,6 +51,11 @@ export function MyProcessesDataTableRowActions({
     role: userRole,
   });
 
+  const canEditObservation = authClient.admin.checkRolePermission({
+    permissions: { process: ["edit_observation"] },
+    role: userRole,
+  });
+
   const [canDeleteOwn, setCanDeleteOwn] = useState(false);
 
   useEffect(() => {
@@ -68,6 +75,8 @@ export function MyProcessesDataTableRowActions({
 
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditObservationDialog, setShowEditObservationDialog] =
+    useState(false);
   const [showFinishDialog, setShowFinishDialog] = useState(false);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -127,6 +136,15 @@ export function MyProcessesDataTableRowActions({
             </DropdownMenuItem>
           )}
 
+          {!canEdit && canEditObservation && (
+            <DropdownMenuItem
+              onClick={() => setShowEditObservationDialog(true)}
+            >
+              <NotepadText className="mr-2 h-4 w-4" />
+              Editar Observação
+            </DropdownMenuItem>
+          )}
+
           {canDeleteOwn && isOpen && (
             <DropdownMenuItem
               onClick={() => setShowDeleteDialog(true)}
@@ -144,6 +162,14 @@ export function MyProcessesDataTableRowActions({
           process={processData}
           open={showEditDialog}
           onOpenChange={setShowEditDialog}
+        />
+      )}
+
+      {!canEdit && canEditObservation && (
+        <EditObservationDialog
+          process={processData}
+          open={showEditObservationDialog}
+          onOpenChange={setShowEditObservationDialog}
         />
       )}
 

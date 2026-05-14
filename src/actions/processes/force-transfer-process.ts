@@ -69,6 +69,7 @@ export const forceTransferProcess = withPermissions(
             pendingTransferObservation: null,
             pendingTransferCreatedAt: null,
             location: null,
+            observation: null,
           },
         }),
         prisma.processEvent.create({

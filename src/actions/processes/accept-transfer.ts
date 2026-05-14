@@ -45,6 +45,7 @@ export const acceptTransfer = withPermissions(
             pendingTransferToUserId: null,
             pendingTransferObservation: null,
             pendingTransferCreatedAt: null,
+            observation: null,
           },
         }),
         prisma.processEvent.create({

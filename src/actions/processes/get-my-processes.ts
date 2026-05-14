@@ -101,6 +101,8 @@ export const getMyProcesses = withPermissions(
         pendingTransferObservation: proc.pendingTransferObservation,
         pendingTransferCreatedAt: proc.pendingTransferCreatedAt,
         location: proc.location,
+        externalOrigin: proc.externalOrigin,
+        observation: proc.observation,
       }));
 
       return createSuccessResponse({

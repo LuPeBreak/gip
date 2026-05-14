@@ -48,6 +48,7 @@ export const getProcessById = withPermissions(
         updatedAt: process.updatedAt,
         location: process.location,
         externalOrigin: process.externalOrigin,
+        observation: process.observation,
       });
     } catch (error) {
       console.error("Erro ao buscar processo por ID:", error);
